@@ -1,3 +1,7 @@
+package com.dennie170.day1
+
+import runMeasuredSolution
+
 val INPUT = """
     ninefourone1
     53sevenvvqm
