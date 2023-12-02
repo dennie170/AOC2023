@@ -113,13 +113,23 @@ fun main() {
         part1(INPUT)
     }
 
+    runMeasuredSolution(2) {
+        part2(INPUT)
+    }
 }
 
 fun part1(lines: Sequence<String>): Int {
     return lines.map(::mapToGame).filter(::isSolvable).map { it.id }.reduce { acc, id ->
         acc + id
     }
+}
 
+fun part2(lines: Sequence<String>): Int {
+    return lines.map(::mapToGame).map(::getHighestGameCubes).map {
+        it.red * it.green * it.blue
+    }.reduce { acc, i ->
+        acc + i
+    }
 }
 
 fun mapToGame(game: String): Game {
@@ -155,6 +165,14 @@ fun isSolvable(set: GameSet): Boolean {
     return set.blue <= MAX_SET.blue
             && set.red <= MAX_SET.red
             && set.green <= MAX_SET.green
+}
+
+fun getHighestGameCubes(game: Game): GameSet {
+    val red = game.sets.maxBy { it.red }.red
+    val blue = game.sets.maxBy { it.blue }.blue
+    val green = game.sets.maxBy { it.green }.green
+
+    return GameSet(blue, red, green)
 }
 
 data class Game(val id: Int, val sets: List<GameSet>)
