@@ -1,9 +1,10 @@
-package com.dennie170.day2
+package com.dennie170.challenges
 
-import runMeasuredSolution
+import com.dennie170.Day
 import java.util.regex.Pattern
 
-val INPUT = """
+class Day2 : Day<Int>(2) {
+    private val input = """
 Game 1: 12 red, 2 green, 5 blue; 9 red, 6 green, 4 blue; 10 red, 2 green, 5 blue; 8 blue, 9 red
 Game 2: 3 green, 7 red; 3 blue, 5 red; 2 green, 1 blue, 6 red; 3 green, 2 red, 3 blue
 Game 3: 12 red, 18 blue, 3 green; 14 red, 4 blue, 2 green; 4 green, 15 red
@@ -106,74 +107,65 @@ Game 99: 1 red, 6 green, 3 blue; 7 blue, 1 red, 2 green; 1 red, 4 green; 6 green
 Game 100: 5 green, 1 red; 1 red, 6 green; 6 blue, 1 red, 6 green; 6 blue, 1 green, 2 red; 8 blue, 1 red, 4 green; 8 green, 5 blue
 """.trimIndent().lineSequence()
 
-val MAX_SET = GameSet(14, 12, 13)
+    private val maxSet = GameSet(14, 12, 13)
 
-fun main() {
-    runMeasuredSolution(1) {
-        part1(INPUT)
+    override fun part1(): Int {
+        return input.map(::mapToGame).filter(::isSolvable).map { it.id }.reduce { acc, id ->
+            acc + id
+        }
     }
 
-    runMeasuredSolution(2) {
-        part2(INPUT)
+    override fun part2(): Int {
+        return input.map(::mapToGame).map(::getHighestGameCubes).map {
+            it.red * it.green * it.blue
+        }.reduce { acc, i ->
+            acc + i
+        }
     }
-}
 
-fun part1(lines: Sequence<String>): Int {
-    return lines.map(::mapToGame).filter(::isSolvable).map { it.id }.reduce { acc, id ->
-        acc + id
-    }
-}
+    private fun mapToGame(game: String): Game {
+        val id = Regex("Game ([0-9]+):.*").matchAt(game, 0)!!.groups[1]!!.value.toInt()
 
-fun part2(lines: Sequence<String>): Int {
-    return lines.map(::mapToGame).map(::getHighestGameCubes).map {
-        it.red * it.green * it.blue
-    }.reduce { acc, i ->
-        acc + i
-    }
-}
+        val sets = game.replace("Game $id: ", "").split(';').map {
+            val matcher = Pattern.compile("([0-9]+) ([a-z]+)").matcher(it)
 
-fun mapToGame(game: String): Game {
-    val id = Regex("Game ([0-9]+):.*").matchAt(game, 0)!!.groups[1]!!.value.toInt()
+            val cubes = mutableMapOf<String, Int>()
 
-    val sets = game.replace("Game $id: ", "").split(';').map {
-        val matcher = Pattern.compile("([0-9]+) ([a-z]+)").matcher(it)
+            while (matcher.find()) {
+                val cube = matcher.group()
 
-        val cubes = mutableMapOf<String, Int>()
+                val color = Regex("([a-z]+)").find(cube)!!.value
+                val amount = Regex("([0-9]+)").find(cube)!!.value.toInt()
 
-        while (matcher.find()) {
-            val cube = matcher.group()
+                cubes[color] = amount
+            }
 
-            val color = Regex("([a-z]+)").find(cube)!!.value
-            val amount = Regex("([0-9]+)").find(cube)!!.value.toInt()
-
-            cubes[color] = amount
+            cubes
+        }.map {
+            GameSet(it["blue"] ?: 0, it["red"] ?: 0, it["green"] ?: 0)
         }
 
-        cubes
-    }.map {
-        GameSet(it["blue"] ?: 0, it["red"] ?: 0, it["green"] ?: 0)
+        return Game(id, sets)
     }
 
-    return Game(id, sets)
+    private fun isSolvable(game: Game): Boolean {
+        return game.sets.all(::isSolvable)
+    }
+
+    private fun isSolvable(set: GameSet): Boolean {
+        return set.blue <= maxSet.blue
+                && set.red <= maxSet.red
+                && set.green <= maxSet.green
+    }
+
+    private fun getHighestGameCubes(game: Game): GameSet {
+        val red = game.sets.maxBy { it.red }.red
+        val blue = game.sets.maxBy { it.blue }.blue
+        val green = game.sets.maxBy { it.green }.green
+
+        return GameSet(blue, red, green)
+    }
+
+    data class Game(val id: Int, val sets: List<GameSet>)
+    data class GameSet(val blue: Int, val red: Int, val green: Int)
 }
-
-fun isSolvable(game: Game): Boolean {
-    return game.sets.all(::isSolvable)
-}
-
-fun isSolvable(set: GameSet): Boolean {
-    return set.blue <= MAX_SET.blue
-            && set.red <= MAX_SET.red
-            && set.green <= MAX_SET.green
-}
-
-fun getHighestGameCubes(game: Game): GameSet {
-    val red = game.sets.maxBy { it.red }.red
-    val blue = game.sets.maxBy { it.blue }.blue
-    val green = game.sets.maxBy { it.green }.green
-
-    return GameSet(blue, red, green)
-}
-
-data class Game(val id: Int, val sets: List<GameSet>)
-data class GameSet(val blue: Int, val red: Int, val green: Int)

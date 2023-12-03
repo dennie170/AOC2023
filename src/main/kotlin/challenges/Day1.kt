@@ -1,8 +1,9 @@
-package com.dennie170.day1
+package com.dennie170.challenges
 
-import runMeasuredSolution
+import com.dennie170.Day
 
-val INPUT = """
+class Day1 : Day<Int>(1) {
+    private val input = """
     ninefourone1
     53sevenvvqm
     kscpjfdxp895foureightckjjl1
@@ -1005,53 +1006,43 @@ val INPUT = """
     two2tdjdfbqtqxrs119r
 """.trimIndent().lineSequence()
 
-fun main() {
-    runMeasuredSolution(1) {
-        part1(INPUT)
+    override fun part1(): Int {
+        return input.map {
+            val res = it.replace(Regex("\\D"), "")
+
+            if (res.length == 1) res.repeat(2) else res
+        }.map {
+            "${it.first()}${it.last()}".toInt()
+        }.reduce { acc, item ->
+            acc + item
+        }
     }
 
-    runMeasuredSolution(2) {
-        part2(INPUT)
-    }
-}
-
-fun part1(lines: Sequence<String>): Int {
-    return lines.map {
-        val res = it.replace(Regex("\\D"), "")
-
-        if (res.length == 1) res.repeat(2) else res
-    }.map {
-        "${it.first()}${it.last()}".toInt()
-    }.reduce { acc, item ->
-        acc + item
-    }
-}
-
-fun part2(lines: Sequence<String>): Int {
-    return lines.map {
-        it.replace("twone", "21")
-            .replace("oneight", "18")
-            .replace("eightwo", "82")
-            .replace("eighthree", "83")
-            .replace("nineight", "98")
-            .replace("sevenine", "79")
-            .replace("fiveight", "58")
-            .replace("one", "1")
-            .replace("two", "2")
-            .replace("three", "3")
-            .replace("four", "4")
-            .replace("five", "5")
-            .replace("six", "6")
-            .replace("seven", "7")
-            .replace("eight", "8")
-            .replace("nine", "9")
-            .replace(Regex("\\D"), "")
-    }
-        .map {
+    override fun part2(): Int {
+        return input.map {
+            it.replace("twone", "21")
+                .replace("oneight", "18")
+                .replace("eightwo", "82")
+                .replace("eighthree", "83")
+                .replace("nineight", "98")
+                .replace("sevenine", "79")
+                .replace("fiveight", "58")
+                .replace("one", "1")
+                .replace("two", "2")
+                .replace("three", "3")
+                .replace("four", "4")
+                .replace("five", "5")
+                .replace("six", "6")
+                .replace("seven", "7")
+                .replace("eight", "8")
+                .replace("nine", "9")
+                .replace(Regex("\\D"), "")
+        }.map {
             if (it.length == 1) it.repeat(2) else it
         }.map {
             "${it.first()}${it.last()}".toInt()
         }.reduce { acc, item ->
             acc + item
         }
+    }
 }
