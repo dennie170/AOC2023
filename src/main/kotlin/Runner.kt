@@ -2,17 +2,17 @@ import com.dennie170.Day
 import kotlin.time.Duration
 
 fun main() {
+//   runAll()
+
+    runDay(3)
+}
+
+fun runAll() {
     var totalDuration = Duration.ZERO
 
     for (i in 1..31) {
         try {
-            val clazz = Any::class::class.java.classLoader.loadClass("com.dennie170.challenges.Day$i")
-
-            val day = clazz.getConstructor().newInstance() as Day<*>
-
-            day.setUp()
-
-            totalDuration += runDayMeasured(day)
+            totalDuration += runDay(i)
         } catch (_: ClassNotFoundException) {
         }
     }
@@ -20,3 +20,11 @@ fun main() {
     println("${yellow}TOTAL TIME TAKEN: $blue$totalDuration")
 }
 
+fun runDay(day: Int): Duration {
+    val clazz = Any::class::class.java.classLoader.loadClass("com.dennie170.challenges.Day$day")
+    val dayInstance = clazz.getConstructor().newInstance() as Day<*>
+
+    dayInstance.setUp()
+
+    return runDayMeasured(dayInstance)
+}
