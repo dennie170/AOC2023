@@ -4,7 +4,7 @@ import kotlin.time.Duration
 fun main() {
 //   runAll()
 
-    runDay(3)
+    runDay(4)
 }
 
 fun runAll() {
