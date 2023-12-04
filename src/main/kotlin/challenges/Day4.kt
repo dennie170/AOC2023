@@ -17,6 +17,24 @@ class Day4 : Day<Int>(4) {
                     acc * 2
                 }
         }
+
+        fun getRecursiveScratchCardsCount(cards: List<Card>): Int {
+            val matches = yourNumbers.intersect(winningNumbers)
+
+            if (matches.isEmpty()) {
+                return 0
+            }
+
+            val range = (number + 1).rangeUntil(number + 1 + matches.size)
+
+            val nextCards = cards.filter { range.contains(it.number) }
+
+            if(nextCards.isEmpty()) return matches.size
+
+            return nextCards.fold(matches.size) { acc, card ->
+                acc + card.getRecursiveScratchCardsCount(cards)
+            }
+        }
     }
 
     private val input = """
@@ -247,6 +265,10 @@ Card 207: 52 14 61 69 16 53  1 34  9 77 | 21 59 75 39 60 40 38 74 95 97 46 80 19
     }
 
     override fun part2(): Int {
-        return 0
+        val cards = input.map(::stringToCard).toList()
+
+
+        return cards.fold(cards.size) { acc, card ->  acc + card.getRecursiveScratchCardsCount(cards) }
+
     }
 }
