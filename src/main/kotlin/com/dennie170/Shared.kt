@@ -1,4 +1,5 @@
-import com.dennie170.Day
+package com.dennie170
+
 import kotlin.time.Duration
 import kotlin.time.measureTime
 

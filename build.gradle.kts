@@ -23,5 +23,15 @@ kotlin {
 }
 
 application {
-    mainClass.set("MainKt")
+    mainClass.set("com.dennie170.Runner")
+}
+
+tasks.jar {
+    manifest.attributes["Main-Class"] = "com.dennie170.Runner"
+    val dependencies = configurations
+        .runtimeClasspath
+        .get()
+        .map(::zipTree) // OR .map { zipTree(it) }
+    from(dependencies)
+    duplicatesStrategy = DuplicatesStrategy.EXCLUDE
 }
