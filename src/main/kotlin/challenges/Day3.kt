@@ -148,6 +148,8 @@ class Day3 : Day<Int>(3) {
 ......138....366..797...........584.......247.........................427..206..843...618.....530......................................172..
     """.trimIndent().replace("\n", "").toCharArray()
 
+    private lateinit var matrix: Array<Array<Char>>
+
     override fun part1(): Int {
         val matrix = getMatrix()
 
@@ -193,7 +195,7 @@ class Day3 : Day<Int>(3) {
 
         val adjacentNumbers = flattenedNumbers.filter { (key, value) ->
             (0..value.length).any {
-                characters.containsKey(key + it)  ||
+                characters.containsKey(key + it) ||
                         characters.containsKey((key + it) + matrix.indices.count()) ||
                         characters.containsKey((key + it) - matrix.indices.count()) ||
 
@@ -208,8 +210,27 @@ class Day3 : Day<Int>(3) {
         }
     }
 
+    data class Vector2(val row: Int, val col: Int)
+
     override fun part2(): Int {
-        return 0
+        matrix = getMatrix()
+        val matrixSize = matrix.indices.count()
+
+        val asterisks = mutableListOf<Vector2>()
+
+        for(row in 0..< matrixSize) {
+            for (col in 0..< matrixSize) {
+                if(matrix[row][col] == '*') {
+                    asterisks.add(Vector2(row, col))
+                }
+            }
+        }
+
+        return asterisks.map {
+            getGearRatioFromAsterisk(it)
+        }.reduce { acc, i ->
+            acc + i
+        }
     }
 
     private fun getMatrix(): Array<Array<Char>> {
@@ -228,4 +249,70 @@ class Day3 : Day<Int>(3) {
 
         return matrix
     }
+
+    private fun getGearRatioFromAsterisk(asterisk: Vector2): Int {
+        val result = mutableListOf<Int>()
+
+        val rows = (asterisk.row - 1 .. asterisk.row + 1)
+        val columns = (asterisk.col -1 .. asterisk.col + 1)
+ // 7 -> 139
+
+        // 696 x 148
+        for (row in rows) {
+            for (col in columns) {
+                if(matrix.getOrNull(row) == null || matrix[row].getOrNull(col) == null) {
+                    continue
+                }
+                val char = matrix[row][col]
+
+                if(char.isDigit()) {
+                    result.add(readNumber(row, col))
+                }
+            }
+        }
+
+        if(result.size < 2) {
+            return 0
+        }
+
+        val unique = result.distinct()
+
+        if(unique.size < 2) {
+            return 0
+        }
+
+        return unique[0] * unique[1]
+    }
+
+    private fun readNumber(row: Int, col: Int): Int {
+        val sb = StringBuilder()
+
+        // Read left first
+        var currentColumn = col
+
+        try {
+            do {
+                if(!matrix[row][currentColumn].isDigit()) break
+
+                sb.insert(0, matrix[row][currentColumn]) // prepend
+                currentColumn--
+            } while(matrix[row][currentColumn] != null)
+
+            currentColumn = col + 1
+
+            do {
+                if(!matrix[row][currentColumn].isDigit()) break
+
+                sb.append(matrix[row][currentColumn]) // append
+                currentColumn++
+            } while(matrix[row][currentColumn] != null)
+        } catch (_: IndexOutOfBoundsException) {
+        }
+
+        val int = sb.toString().toInt()
+        sb.clear()
+
+        return int
+    }
+
 }
