@@ -5,6 +5,8 @@ import com.dennie170.Day
 class Day4 : Day<Int>(4) {
 
     data class Card(val number: Int, val winningNumbers: Set<Int>, val yourNumbers: Set<Int>) {
+        private var cardCountMatch: Int? = null
+
         fun calculateScore(): Int {
             val matches = yourNumbers.intersect(winningNumbers)
 
@@ -19,6 +21,8 @@ class Day4 : Day<Int>(4) {
         }
 
         fun getRecursiveScratchCardsCount(cards: List<Card>): Int {
+            if(cardCountMatch != null) return cardCountMatch!!
+
             val matches = yourNumbers.intersect(winningNumbers)
 
             if (matches.isEmpty()) {
@@ -31,9 +35,11 @@ class Day4 : Day<Int>(4) {
 
             if(nextCards.isEmpty()) return matches.size
 
-            return nextCards.fold(matches.size) { acc, card ->
+            cardCountMatch = nextCards.fold(matches.size) { acc, card ->
                 acc + card.getRecursiveScratchCardsCount(cards)
             }
+
+            return cardCountMatch!!
         }
     }
 
