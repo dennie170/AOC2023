@@ -12,7 +12,7 @@ class Day4 : Day<Int>(4) {
                 return 0
             }
 
-            return matches.drop(1)
+            return matches.toMutableList().apply { this.remove(0) }
                 .fold(1) { acc: Int, _: Int ->
                     acc * 2
                 }
