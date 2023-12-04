@@ -1,7 +1,6 @@
 package com.dennie170.challenges
 
 import com.dennie170.Day
-import java.util.regex.Pattern
 
 class Day4 : Day<Int>(4) {
 
@@ -239,11 +238,9 @@ Card 207: 52 14 61 69 16 53  1 34  9 77 | 21 59 75 39 60 40 38 74 95 97 46 80 19
     }
 
     private fun stringToCard(input: String): Card {
-        val matcher = Pattern.compile("Card\\s+([0-9]+): ([0-9\\s]+) \\| ([0-9\\s]+)").matcher(input).apply { find() }
-
-        val id = matcher.group(1).toInt()
-        val winningNumbers = matcher.group(2).split(' ').filter(String::isNotEmpty).map(String::toInt).toSet()
-        val yourNumbers = matcher.group(3).split(' ').filter(String::isNotEmpty).map(String::toInt).toSet()
+        val id = input.substringBefore(':').substring(5).trim().toInt()
+        val winningNumbers = input.substringAfter(':').substringBefore('|').split(' ').filter(String::isNotEmpty).map(String::toInt).toSet()
+        val yourNumbers = input.substringAfter('|').split(' ').filter(String::isNotEmpty).map(String::toInt).toSet()
 
         return Card(id, winningNumbers, yourNumbers)
 
