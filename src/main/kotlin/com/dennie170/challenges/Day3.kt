@@ -255,10 +255,9 @@ class Day3 : Day<Int>(3) {
 
         val rows = (asterisk.row - 1 .. asterisk.row + 1)
         val columns = (asterisk.col -1 .. asterisk.col + 1)
- // 7 -> 139
 
-        // 696 x 148
         for (row in rows) {
+            var foundDigit = false
             for (col in columns) {
                 if(matrix.getOrNull(row) == null || matrix[row].getOrNull(col) == null) {
                     continue
@@ -266,7 +265,12 @@ class Day3 : Day<Int>(3) {
                 val char = matrix[row][col]
 
                 if(char.isDigit()) {
-                    result.add(readNumber(row, col))
+                    if(!foundDigit) {
+                        result.add(readNumber(row, col))
+                    }
+                    foundDigit = true
+                } else {
+                    foundDigit = false
                 }
             }
         }
@@ -275,13 +279,7 @@ class Day3 : Day<Int>(3) {
             return 0
         }
 
-        val unique = result.distinct()
-
-        if(unique.size < 2) {
-            return 0
-        }
-
-        return unique[0] * unique[1]
+        return result[0] * result[1]
     }
 
     private fun readNumber(row: Int, col: Int): Int {
