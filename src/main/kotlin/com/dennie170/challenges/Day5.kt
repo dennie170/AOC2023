@@ -239,7 +239,19 @@ humidity-to-location map:
     }
 
     override fun part2(): Long {
-        return 0
+        val almanac = Almanac.parse(input)
+
+        var seeds = almanac.seeds.chunked(2).map { it.first().rangeUntil(it.first() + it.last()) }.flatMap {
+            it.toList()
+        }
+
+        for (map in almanac.maps) {
+            seeds = seeds.map {
+                mapItemToNext(it, map.value)
+            }
+        }
+
+        return seeds.min()
     }
 
 
