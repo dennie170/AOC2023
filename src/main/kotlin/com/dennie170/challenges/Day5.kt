@@ -4,7 +4,7 @@ import com.dennie170.Day
 import java.util.regex.Pattern
 import kotlin.math.abs
 
-class Day5 : Day<Int>(5) {
+class Day5 : Day<Long>(5) {
     private val input = """
         seeds: 79 14 55 13
 
@@ -41,7 +41,7 @@ class Day5 : Day<Int>(5) {
         56 93 4
     """.trimIndent()
 
-    override fun part1(): Int {
+    override fun part1(): Long {
         val almanac = Almanac.parse(input)
 
 
@@ -56,7 +56,7 @@ class Day5 : Day<Int>(5) {
         return seeds.min()
     }
 
-    private fun mapItemToNext(item: Int, map: List<Range>): Int {
+    private fun mapItemToNext(item: Long, map: List<Range>): Long {
         val sources = map.map {
             it.source.rangeUntil(it.source + it.length)
         }
@@ -74,18 +74,18 @@ class Day5 : Day<Int>(5) {
         return destinations[destinationIndex].toList().getOrNull(index) ?: return item
     }
 
-    override fun part2(): Int {
+    override fun part2(): Long {
         return 0
     }
 
 
-    data class Almanac(val seeds: List<Int>, val maps: Map<String, List<Range>>) {
+    data class Almanac(val seeds: List<Long>, val maps: Map<String, List<Range>>) {
         companion object {
             fun parse(input: String): Almanac {
                 val seeds = input.substring(7)
                     .substringBefore('\n')
                     .split(' ')
-                    .map(String::toInt)
+                    .map(String::toLong)
 
                 val maps = mutableMapOf<String, List<Range>>()
                 val matcher = Pattern.compile("([a-z-]+ map:\\n[0-9\\s]+)").matcher(input)
@@ -94,8 +94,8 @@ class Day5 : Day<Int>(5) {
                     val lines = matcher.group(1).lines()
                     val name = lines.removeFirst().substringBefore(' ')
                     val ranges = lines.filter(String::isNotEmpty).map {
-                        val line = it.split(' ').filter(String::isNotEmpty).map(String::toInt)
-                        Range(line[0], line[1], line[2])
+                        val line = it.split(' ').filter(String::isNotEmpty)
+                        Range(line[0].toLong(), line[1].toLong(), line[2].toInt())
                     }
 
                     maps[name] = ranges
@@ -107,18 +107,5 @@ class Day5 : Day<Int>(5) {
     }
 
 
-    data class Range(val destination: Int, val source: Int, val length: Int)
-}
-
-fun List<Int>.closest(of: Int): Int {
-    var min = Int.MAX_VALUE
-    var closest = of
-    for (v in this) {
-        val diff = abs((v - of).toDouble()).toInt()
-        if (diff < min) {
-            min = diff
-            closest = v
-        }
-    }
-    return closest
+    data class Range(val destination: Long, val source: Long, val length: Int)
 }
