@@ -2,7 +2,6 @@ package com.dennie170.challenges
 
 import com.dennie170.Day
 import java.util.regex.Pattern
-import kotlin.math.abs
 
 class Day5 : Day<Long>(5) {
     private val input = """
@@ -212,7 +211,7 @@ humidity-to-location map:
 
         for (map in almanac.maps) {
             seeds = seeds.map {
-                mapItemToNext(it, map.value )
+                mapItemToNext(it, map.value)
             }
         }
 
@@ -230,13 +229,13 @@ humidity-to-location map:
 
         val destinationIndex = sources.indexOfFirst { it.contains(item) }
 
-        if(destinationIndex == -1) return item
+        if (destinationIndex == -1) return item
 
-        val index  = sources[destinationIndex].indexOf(item)
+        val index = item - sources[destinationIndex].first
 
         val added = destinations[destinationIndex].first + index
 
-        return if(destinations[destinationIndex].contains(added)) added else item
+        return if (destinations[destinationIndex].contains(added)) added else item
     }
 
     override fun part2(): Long {
@@ -255,7 +254,7 @@ humidity-to-location map:
                 val maps = mutableMapOf<String, List<Range>>()
                 val matcher = Pattern.compile("([a-z-]+ map:\\n[0-9\\s]+)").matcher(input)
 
-                while(matcher.find()) {
+                while (matcher.find()) {
                     val lines = matcher.group(1).lines()
                     val name = lines.removeFirst().substringBefore(' ')
                     val ranges = lines.filter(String::isNotEmpty).map {
