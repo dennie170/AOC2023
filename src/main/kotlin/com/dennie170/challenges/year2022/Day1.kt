@@ -4,7 +4,7 @@ import com.dennie170.Day
 
 class Day1 : Day<Int>(1) {
 
-    private  val input = """
+    private val input = """
 4456
 15332
 15148
@@ -2274,16 +2274,17 @@ class Day1 : Day<Int>(1) {
 1145
     """.trimIndent()
 
-    override fun part1(): Int {
-        val elves = input.split("\n\n").map {
+    private fun getElves(): List<Int> {
+        return input.split("\n\n").map {
             it.lineSequence().map { line -> line.trim().toInt() }.toList()
         }.map { it.fold(0) { acc, i -> acc + i } }
+    }
 
-        return elves.max()
+    override fun part1(): Int {
+        return getElves().max()
     }
 
     override fun part2(): Int {
-        return -1
+        return getElves().sortedByDescending { it }.take(3).reduce { acc, i -> acc + i }
     }
-
 }
