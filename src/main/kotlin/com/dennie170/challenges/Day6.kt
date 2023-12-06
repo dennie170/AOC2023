@@ -4,8 +4,8 @@ import com.dennie170.Day
 
 class Day6 : Day<Int>(6) {
     private val input = """
-        Time:        40     70     98     79
-        Distance:   215   1051   2147   1005
+Time:      7  15   30
+Distance:  9  40  200
     """.trimIndent()
 
 
@@ -42,7 +42,13 @@ class Day6 : Day<Int>(6) {
     }
 
     override fun part2(): Int {
-        return -1
+        val race = input.lines().map { it.substringAfter(':').trim() }
+            .map { it.replace(" ", "").trim().toInt() }
+            .zipWithNext().map {
+                Race(it.first, it.second)
+            }.first()
+
+        return getPossibilities(race)
     }
 
     data class Race(val time: Int, val record: Int)
