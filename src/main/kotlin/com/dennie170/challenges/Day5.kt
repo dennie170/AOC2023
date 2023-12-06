@@ -239,19 +239,21 @@ humidity-to-location map:
     }
 
     override fun part2(): Long {
-        val almanac = Almanac.parse(input)
+        // Disabled because this takes way too long
+        return -1L
+        // val almanac = Almanac.parse(input)
 
-        var seeds = almanac.seeds.chunked(2).map { it.first().rangeUntil(it.first() + it.last()) }.flatMap {
-            it.toList()
-        }
+        // var seeds = almanac.seeds.chunked(2).map { it.first().rangeUntil(it.first() + it.last()) }.flatMap {
+        //     it.toList()
+        // }
 
-        for (map in almanac.maps) {
-            seeds = seeds.map {
-                mapItemToNext(it, map.value)
-            }
-        }
+        // for (map in almanac.maps) {
+        //     seeds = seeds.map {
+        //         mapItemToNext(it, map.value)
+        //     }
+        // }
 
-        return seeds.min()
+        // return seeds.min()
     }
 
 
