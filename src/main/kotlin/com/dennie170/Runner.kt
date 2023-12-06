@@ -5,25 +5,34 @@ import kotlin.time.Duration
 class Runner {
     companion object {
        @JvmStatic fun main(args: Array<String>) {
-//            runAll()
-             runDay(6)
+            runAll()
+//             runDay(6)
         }
 
         private fun runAll() {
             var totalDuration = Duration.ZERO
 
-            for (i in 1..31) {
-                try {
-                    totalDuration += runDay(i)
-                } catch (_: ClassNotFoundException) {
+            for (year in 2022..2023) {
+                var yearDuration = Duration.ZERO
+
+                for (day in 1..31) {
+                    try {
+                        yearDuration += runDay(year, day)
+                    } catch (_: ClassNotFoundException) {
+                    } catch (_: NotImplementedError) {
+                    }
                 }
+
+                println("${yellow}Year $year took: $blue$yearDuration")
+
+                totalDuration += yearDuration
             }
 
             println("${yellow}TOTAL TIME TAKEN: $blue$totalDuration")
         }
 
-        private fun runDay(day: Int): Duration {
-            val clazz = Any::class::class.java.classLoader.loadClass("com.dennie170.challenges.Day$day")
+        private fun runDay(year: Int, day: Int): Duration {
+            val clazz = Any::class::class.java.classLoader.loadClass("com.dennie170.challenges.year${year}.Day$day")
             val dayInstance = clazz.getConstructor().newInstance() as Day<*>
 
             dayInstance.setUp()

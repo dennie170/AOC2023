@@ -1,4 +1,4 @@
-package com.dennie170.challenges
+package com.dennie170.challenges.year2023
 
 import com.dennie170.Day
 import kotlin.math.sqrt
