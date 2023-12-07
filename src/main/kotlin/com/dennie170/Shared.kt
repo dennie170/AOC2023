@@ -14,8 +14,22 @@ fun <T> runDayMeasured(day: Day<T>): Duration {
     var part1Result: T
     var part2Result: T
 
-    val part1Time = measureTime { part1Result = day.part1() }
-    val part2Time = measureTime { part2Result = day.part2() }
+    val part1Time = try {
+        measureTime { part1Result = day.part1() }
+    } catch (e: NotImplementedError) {
+        @Suppress("UNCHECKED_CAST")
+        part1Result = (-1 as T)
+        Duration.ZERO
+    }
+
+    val part2Time = try {
+        measureTime { part2Result = day.part2() }
+    } catch (e: NotImplementedError) {
+        @Suppress("UNCHECKED_CAST")
+        part2Result = (-1 as T)
+        Duration.ZERO
+    }
+
     val totalTime = part1Time + part2Time
 
     println("    ${yellow}Solution for part 1: $green$part1Result$reset. [$blue${part1Time}$reset]")

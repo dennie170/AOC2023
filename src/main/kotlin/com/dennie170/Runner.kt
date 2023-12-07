@@ -5,8 +5,8 @@ import kotlin.time.Duration
 class Runner {
     companion object {
        @JvmStatic fun main(args: Array<String>) {
-            runAll()
-//             runDay(6)
+//            runAll()
+             runDay(2023, 7)
         }
 
         private fun runAll() {
@@ -19,7 +19,6 @@ class Runner {
                     try {
                         yearDuration += runDay(year, day)
                     } catch (_: ClassNotFoundException) {
-                    } catch (_: NotImplementedError) {
                     }
                 }
 
