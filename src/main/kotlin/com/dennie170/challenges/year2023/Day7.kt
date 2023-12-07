@@ -1023,22 +1023,43 @@ A33J3 675
             '3' to "02",
             '2' to "01",
         )
+
+        val part2StrengthMap = mapOf(
+            'A' to "13",
+            'K' to "12",
+            'Q' to "11",
+            'T' to "10",
+            '9' to "09",
+            '8' to "08",
+            '7' to "07",
+            '6' to "06",
+            '5' to "05",
+            '4' to "04",
+            '3' to "03",
+            '2' to "02",
+            'J' to "01",
+        )
+    }
+
+    private fun getCards() = input.lineSequence().map(::mapCard)
+
+    private fun mapCard(input: String): Hand {
+        val cards = input.substring(0, 5).toCharArray().map(::Card)
+        val bid = input.substring(6, input.length).toInt()
+
+        return Hand(cards, bid)
     }
 
     override fun part1(): Int {
-        return input.lineSequence()
-            .map {
-                val cards = it.substring(0, 5).toCharArray().map(::Card)
-                val bid = it.substring(6, it.length).toInt()
-
-                Hand(cards, bid)
-            }
+        return getCards()
             .sortedWith(compareBy<Hand> { it.strength }.thenBy { it.cardsWeight })
             .mapIndexed { index, strength -> strength.bidAmount * (index + 1) }.reduce { acc, i -> acc + i }
     }
 
     override fun part2(): Int {
-        TODO("Not yet implemented")
+        return getCards()
+            .sortedWith(compareBy<Hand> { it.part2Strength }.thenBy { it.part2CardWeight })
+            .mapIndexed { index, strength -> strength.bidAmount * (index + 1) }.reduce { acc, i -> acc + i }
     }
 
     data class Hand(val cards: List<Card>, val bidAmount: Int) {
@@ -1072,6 +1093,10 @@ A33J3 675
             return cards.distinct().size == cards.size
         }
 
+        private fun getJokerCount(): Int {
+            return cards.count { it.value == 'J' }
+        }
+
         val strength: Strength by lazy {
             if (isFiveOfAKind()) {
                 Strength.FIVE_OF_KIND
@@ -1092,9 +1117,46 @@ A33J3 675
             }
         }
 
+        val part2Strength: Strength by lazy {
+            val jokers = getJokerCount()
+
+            // Skip if no jokers
+            when (jokers) {
+                0 -> strength
+                1 -> when (strength) {
+                    Strength.HIGH_CARD -> Strength.ONE_PAIR
+                    Strength.ONE_PAIR -> Strength.THREE_OF_KIND
+                    Strength.TWO_PAIRS -> Strength.FULL_HOUSE
+                    Strength.THREE_OF_KIND -> Strength.FOUR_OF_KIND
+                    Strength.FULL_HOUSE -> Strength.FOUR_OF_KIND
+                    Strength.FOUR_OF_KIND, Strength.FIVE_OF_KIND -> Strength.FIVE_OF_KIND
+                }
+
+                2 -> when (strength) {
+                    Strength.THREE_OF_KIND, Strength.FULL_HOUSE, Strength.FOUR_OF_KIND, Strength.FIVE_OF_KIND -> Strength.FIVE_OF_KIND
+                    Strength.TWO_PAIRS -> Strength.FOUR_OF_KIND
+                    Strength.ONE_PAIR, Strength.HIGH_CARD -> Strength.THREE_OF_KIND
+                }
+
+                3 -> when (strength) {
+                    Strength.ONE_PAIR -> Strength.FIVE_OF_KIND
+                    Strength.FULL_HOUSE -> Strength.FIVE_OF_KIND
+                    else -> Strength.FOUR_OF_KIND
+                }
+
+                else -> Strength.FIVE_OF_KIND
+            }
+        }
+
         val cardsWeight: String by lazy {
             cards.fold("") { acc, card ->
                 acc + strengthMap[card.value]!!
+            }
+        }
+
+        val part2CardWeight: String by lazy {
+            cards.fold("") { acc, card ->
+                acc + part2StrengthMap[card.value]!!
             }
         }
     }
