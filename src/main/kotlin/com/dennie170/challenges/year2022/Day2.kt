@@ -2,7 +2,7 @@ package com.dennie170.challenges.year2022
 
 import com.dennie170.Day
 
-class Day2 : Day<Int>(1) {
+class Day2 : Day<Int>(2022, 2) {
 
     private val input = """
 A Z

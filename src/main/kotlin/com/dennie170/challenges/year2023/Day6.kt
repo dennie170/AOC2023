@@ -2,12 +2,12 @@ package com.dennie170.challenges.year2023
 
 import com.dennie170.Day
 
-class Day6 : Day<Long>(6) {
-    private val input = """
-Time:        40     70     98     79
-Distance:   215   1051   2147   1005
-    """.trimIndent()
+class Day6 : Day<Long>(2023, 6) {
+    private lateinit var input: String
 
+    override fun setUp() {
+        input = super.readInput()
+    }
 
     override fun part1(): Long {
         val lines = input.lines().map { it.substringAfter(':').trim() }
