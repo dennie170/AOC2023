@@ -2,6 +2,7 @@ package com.dennie170.challenges.year2022
 
 import com.dennie170.Day
 import com.dennie170.common.StringSequence
+import com.dennie170.common.intersectAll
 import com.dennie170.common.splitInHalf
 
 class Day3 : Day<Int>(2022, 3) {
@@ -18,13 +19,21 @@ class Day3 : Day<Int>(2022, 3) {
 
             if (shared.size != 1) throw RuntimeException()
 
-            shared[0]
-        }.map { char ->
-            char.code - if(char.code >= 97) 96 else 38
+            charScore(shared[0])
         }.sum()
     }
 
+    private fun charScore(char: Char) = char.code - if (char.code >= 97) 96 else 38
+
     override fun part2(): Int {
-        TODO("Not yet implemented")
+        return input.chunked(3).map { team ->
+            val rucksacks = team.map { it.toCharArray().toSet() }
+
+            val shared = rucksacks.intersectAll().toList()
+
+            if (shared.size != 1) throw RuntimeException()
+
+            charScore(shared[0])
+        }.sum()
     }
 }
