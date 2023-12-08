@@ -60,12 +60,8 @@ class Day8 : Day<Long>(2023, 8) {
             Pair(key, value)
         }
 
-        val steps = mutableListOf<Long>()
-
-        for(a in instructions.keys.filter { it[2] == 'A' }) {
-            steps.add(getStepsFromAtoZ(instructions, a, "Z"))
-        }
-
-        return findLeastCommonMultiple(steps)
+        return instructions.keys.filter { it[2] == 'A' }.map {
+            getStepsFromAtoZ(instructions, it, "Z")
+        }.let(::findLeastCommonMultiple)
     }
 }
