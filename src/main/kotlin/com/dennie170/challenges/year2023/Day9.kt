@@ -21,7 +21,7 @@ class Day9 : Day<Int>(2023, 9) {
             extrapolated.add(currentList)
 
             // Keep extrapolating till we have a list of only zeroes
-            if(currentList.sum() == 0) break
+            if(currentList.all { it == 0 }) break
         }
 
         return extrapolated
@@ -78,4 +78,4 @@ class Day9 : Day<Int>(2023, 9) {
 
 // My input
 // 2105964689 -> Too high
-
+// 2105961943 -> Correct
