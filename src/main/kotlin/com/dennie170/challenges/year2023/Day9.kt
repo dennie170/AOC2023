@@ -66,16 +66,10 @@ class Day9 : Day<Int>(2023, 9) {
     }
 
     override fun part2(): Int {
-        TODO()
+        return input.map { line -> line.split(' ').map { char -> char.toInt()} }
+            .map { it.reversed() }
+            .map(::getExtrapolatedList)
+            .map(::extrapolate)
+            .sum()
     }
 }
-
-// Other input
-// 1882395907 -> Good
-// 1882395934 -> Too high
-
-
-
-// My input
-// 2105964689 -> Too high
-// 2105961943 -> Correct
