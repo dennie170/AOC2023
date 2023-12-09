@@ -70,8 +70,12 @@ class Day9 : Day<Int>(2023, 9) {
     }
 }
 
+// Other input
 // 1882395907 -> Good
 // 1882395934 -> Too high
 
 
+
+// My input
+// 2105964689 -> Too high
 
