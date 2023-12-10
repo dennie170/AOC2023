@@ -1,6 +1,7 @@
 package com.dennie170.challenges.year2023
 
 import com.dennie170.Day
+import com.dennie170.common.getMatrix
 import kotlin.math.sqrt
 
 class Day3 : Day<Int>(2023, 3) {
@@ -13,7 +14,7 @@ class Day3 : Day<Int>(2023, 3) {
     private lateinit var matrix: Array<Array<Char>>
 
     override fun part1(): Int {
-        val matrix = getMatrix()
+        val matrix = getMatrix(input)
 
         val numbers = mutableMapOf<Int, Char>()
         val characters = mutableMapOf<Int, Char>()
@@ -75,7 +76,7 @@ class Day3 : Day<Int>(2023, 3) {
     data class Vector2(val row: Int, val col: Int)
 
     override fun part2(): Int {
-        matrix = getMatrix()
+        matrix = getMatrix(input)
         val matrixSize = matrix.indices.count()
 
         val asterisks = mutableListOf<Vector2>()
@@ -93,23 +94,6 @@ class Day3 : Day<Int>(2023, 3) {
         }.reduce { acc, i ->
             acc + i
         }
-    }
-
-    private fun getMatrix(): Array<Array<Char>> {
-        // Calculate total line length and lines to draw matrix
-        val sqrt = sqrt(input.size.toDouble()).toInt()
-
-        val matrix: Array<Array<Char>> = Array(sqrt) { Array(sqrt) { '0' } }
-
-        for (line in 0..<sqrt) {
-            for (char in 0..<sqrt) {
-
-                // Fill the matrix with the correct chars
-                matrix[line][char] = input[char + (line * sqrt)]
-            }
-        }
-
-        return matrix
     }
 
     private fun getGearRatioFromAsterisk(asterisk: Vector2): Int {
