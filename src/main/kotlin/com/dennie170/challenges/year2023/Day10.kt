@@ -17,14 +17,20 @@ class Day10 : Day<Int>(2023, 10) {
 
     override fun part1(): Int {
 
+        var maxSteps = 0
+
         for (row in matrix.indices) {
             for (col in matrix.indices) {
                 val currentColumn = matrix[row][col]
 
                 if (currentColumn == 'S') {
-                    val connectedDown = isConnectedLoop(Coordinate(row , col+1), Direction.DOWN)
+                    val connectedDown = isConnectedLoop(Coordinate(row , col), Direction.UP)
 
-                    if (connectedDown.connected) return (connectedDown.steps / 2) + 1
+                    if(connectedDown.steps > maxSteps) {
+                        maxSteps = connectedDown.steps
+                    }
+
+                    if (connectedDown.connected) return (connectedDown.steps / 2)
 
                 }
             }
@@ -32,7 +38,7 @@ class Day10 : Day<Int>(2023, 10) {
 
 
 
-        return -1
+        return maxSteps
     }
 
     data class ConnectedResult(val connected: Boolean, val steps: Int)
@@ -69,7 +75,11 @@ class Day10 : Day<Int>(2023, 10) {
             val currentPipe = Pipe.fromChar( matrix[currentLocation.row][currentLocation.col])
 
             if (previousPipe.connectsWith(currentPipe)) {
-                val next = getNextCoordinate(currentLocation, currentDirection, currentPipe)
+                val next = try {
+                    getNextCoordinate(currentLocation, currentDirection, currentPipe)
+                } catch (e: IllegalStateException) {
+                    return ConnectedResult(false, steps)
+                }
                 currentLocation = next.first
                 currentDirection = next.second
 
@@ -78,7 +88,7 @@ class Day10 : Day<Int>(2023, 10) {
                 previousPipe = currentPipe
                 if (currentLocation == startingPoint) return ConnectedResult(true, steps)
             } else {
-                return ConnectedResult(false, 0)
+                return ConnectedResult(false, steps)
             }
 
         }
@@ -106,9 +116,9 @@ class Day10 : Day<Int>(2023, 10) {
                 Pipe.HORIZONTAL -> Direction.RIGHT
                 Pipe.NORTH_WEST -> Direction.UP
                 Pipe.SOUTH_WEST -> Direction.DOWN
-                Pipe.VERTICAL -> if(matrix[coordinate.row][coordinate.col] == 'S') Direction.UP else throw IllegalStateException("Impossible")
-                Pipe.NORTH_EAST -> if(matrix[coordinate.row][coordinate.col] == 'S') Direction.RIGHT else throw IllegalStateException("Impossible")
-                Pipe.SOUTH_EAST -> if(matrix[coordinate.row][coordinate.col] == 'S') Direction.RIGHT else throw IllegalStateException("Impossible")
+                Pipe.VERTICAL -> throw IllegalStateException("Impossible")
+                Pipe.NORTH_EAST -> throw IllegalStateException("Impossible")
+                Pipe.SOUTH_EAST -> throw IllegalStateException("Impossible")
                 Pipe.START -> throw IllegalStateException("Impossible")
             }
 
@@ -116,9 +126,9 @@ class Day10 : Day<Int>(2023, 10) {
                 Pipe.VERTICAL -> Direction.DOWN
                 Pipe.NORTH_EAST -> Direction.RIGHT
                 Pipe.NORTH_WEST -> Direction.LEFT
-                Pipe.HORIZONTAL -> if(matrix[coordinate.row][coordinate.col] == 'S') Direction.RIGHT else throw IllegalStateException("Impossible")
-                Pipe.SOUTH_WEST -> if(matrix[coordinate.row][coordinate.col] == 'S') Direction.DOWN else throw IllegalStateException("Impossible")
-                Pipe.SOUTH_EAST -> if(matrix[coordinate.row][coordinate.col] == 'S') Direction.RIGHT else throw IllegalStateException("Impossible")
+                Pipe.HORIZONTAL -> throw IllegalStateException("Impossible")
+                Pipe.SOUTH_WEST -> throw IllegalStateException("Impossible")
+                Pipe.SOUTH_EAST -> throw IllegalStateException("Impossible")
                 Pipe.START ->throw IllegalStateException("Impossible")
             }
 
@@ -126,17 +136,17 @@ class Day10 : Day<Int>(2023, 10) {
                 Pipe.HORIZONTAL -> Direction.LEFT
                 Pipe.NORTH_EAST -> Direction.UP
                 Pipe.SOUTH_EAST -> Direction.DOWN
-                Pipe.VERTICAL -> if(matrix[coordinate.row][coordinate.col] == 'S') Direction.UP else throw IllegalStateException("Impossible")
-                Pipe.NORTH_WEST -> if(matrix[coordinate.row][coordinate.col] == 'S') Direction.UP else throw IllegalStateException("Impossible")
-                Pipe.SOUTH_WEST -> if(matrix[coordinate.row][coordinate.col] == 'S') Direction.DOWN else throw IllegalStateException("Impossible")
+                Pipe.VERTICAL -> throw IllegalStateException("Impossible")
+                Pipe.NORTH_WEST -> throw IllegalStateException("Impossible")
+                Pipe.SOUTH_WEST -> throw IllegalStateException("Impossible")
                 Pipe.START -> throw IllegalStateException("Impossible")
             }
 
             Direction.UP -> when (pipe) {
                 Pipe.VERTICAL -> Direction.UP
-                Pipe.HORIZONTAL -> if(matrix[coordinate.row][coordinate.col] == 'S') Direction.RIGHT else throw IllegalStateException("Impossible")
-                Pipe.NORTH_EAST -> if(matrix[coordinate.row][coordinate.col] == 'S') Direction.UP else throw IllegalStateException("Impossible")
-                Pipe.NORTH_WEST -> if(matrix[coordinate.row][coordinate.col] == 'S') Direction.UP else throw IllegalStateException("Impossible")
+                Pipe.HORIZONTAL -> throw IllegalStateException("Impossible")
+                Pipe.NORTH_EAST -> throw IllegalStateException("Impossible")
+                Pipe.NORTH_WEST -> throw IllegalStateException("Impossible")
                 Pipe.START -> throw IllegalStateException("Impossible")
                 Pipe.SOUTH_WEST -> Direction.LEFT
                 Pipe.SOUTH_EAST -> Direction.RIGHT
@@ -178,7 +188,7 @@ class Day10 : Day<Int>(2023, 10) {
         fun connectsWith(pipe: Pipe): Boolean {
             return when (this) {
                 VERTICAL -> when (pipe) {
-                    NORTH_EAST, NORTH_WEST, VERTICAL, SOUTH_WEST-> true
+                    NORTH_EAST, NORTH_WEST, VERTICAL, SOUTH_WEST, SOUTH_EAST-> true
                     else -> false
                 }
 
