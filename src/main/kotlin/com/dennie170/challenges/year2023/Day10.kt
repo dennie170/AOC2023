@@ -17,7 +17,10 @@ class Day10 : Day<Int>(2023, 10) {
     }
 
     override fun part1(): Int {
+       return getConnectedLoop().steps / 2
+    }
 
+    private fun getConnectedLoop(): ConnectedResult {
         var maxSteps = 0
 
         for (row in matrix.indices) {
@@ -25,24 +28,31 @@ class Day10 : Day<Int>(2023, 10) {
                 val currentColumn = matrix[row][col]
 
                 if (currentColumn == 'S') {
-                    val connectedDown = isConnectedLoop(Coordinate(row , col), Direction.UP)
+                    val result = isConnectedLoop(Coordinate(row , col), Direction.UP)
 
-                    if(connectedDown.steps > maxSteps) {
-                        maxSteps = connectedDown.steps
+                    if(result.steps > maxSteps) {
+                        maxSteps = result.steps
                     }
 
-                    if (connectedDown.connected) {
-//                        drawResult(connectedDown.history)
-
-                        return (connectedDown.steps / 2)
+                    if (result.connected) {
+                        return ConnectedResult(true, result.steps, result.history)
                     }
 
                 }
             }
         }
 
-        return maxSteps
+        return ConnectedResult(false, maxSteps)
     }
+
+
+    override fun part2(): Int {
+
+        drawResult(getConnectedLoop().history)
+
+        return -1
+    }
+
 
 
     data class ConnectedResult(val connected: Boolean, val steps: Int, val history: List<Pair<Coordinate, Char>> = listOf())
@@ -167,10 +177,6 @@ class Day10 : Day<Int>(2023, 10) {
     }
 
 
-    override fun part2(): Int {
-        return -1
-    }
-
     enum class Direction {
         RIGHT,
         DOWN,
@@ -245,35 +251,34 @@ class Day10 : Day<Int>(2023, 10) {
         fun previousColumn() = Coordinate(row, col - 1)
     }
 
-    private fun drawResult(history: List<Pair<Coordinate, Char>> ) {
-
-        val m = Array(sqrt(input.length.toDouble()).toInt()) { Array(sqrt(input.length.toDouble()).toInt()) { '0' } }
+    private fun getHistoryAsCharArray(history: List<Pair<Coordinate, Char>> ): Array<Array<Char>> {
+        val ret = Array(sqrt(input.length.toDouble()).toInt()) { Array(sqrt(input.length.toDouble()).toInt()) { '0' } }
 
         for(hist in history) {
             val (coord, char) = hist
 
-
-            m[coord.row][coord.col] = when(char) {
-                '-' -> '\u2501'
-                '|' -> '\u2503'
-                'F' -> '\u250F'
-                'J' -> '\u251B'
-                'L' -> '\u2517'
-                '7' -> '\u2513'
-                '0' -> ' '
-                else -> char
-            }
+            ret[coord.row][coord.col] = char
         }
 
+        return ret
+    }
 
+    private fun drawResult(history: List<Pair<Coordinate, Char>> ) {
+        val m = getHistoryAsCharArray(history)
         for (row in m) {
             println()
             for (col in row) {
-                if(col == '0')  {
-                    print(' ')
-                } else {
-                    print(col)
+                val char = when(col) {
+                    '-' -> '\u2501'
+                    '|' -> '\u2503'
+                    'F' -> '\u250F'
+                    'J' -> '\u251B'
+                    'L' -> '\u2517'
+                    '7' -> '\u2513'
+                    else -> col
                 }
+
+                print(char)
             }
         }
     }
