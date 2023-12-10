@@ -13,11 +13,11 @@ class Day10 : Day<Int>(2023, 10) {
 
     override fun setUp() {
         input = super.readInput().replace("\n", "")
-        matrix =  getMatrix(input.toCharArray())
+        matrix = getMatrix(input.toCharArray())
     }
 
     override fun part1(): Int {
-       return getConnectedLoop().steps / 2
+        return getConnectedLoop().steps / 2
     }
 
     private fun getConnectedLoop(): ConnectedResult {
@@ -28,9 +28,9 @@ class Day10 : Day<Int>(2023, 10) {
                 val currentColumn = matrix[row][col]
 
                 if (currentColumn == 'S') {
-                    val result = isConnectedLoop(Coordinate(row , col), Direction.UP)
+                    val result = isConnectedLoop(Coordinate(row, col), Direction.UP)
 
-                    if(result.steps > maxSteps) {
+                    if (result.steps > maxSteps) {
                         maxSteps = result.steps
                     }
 
@@ -45,17 +45,108 @@ class Day10 : Day<Int>(2023, 10) {
         return ConnectedResult(false, maxSteps)
     }
 
+    enum class Status(val status: Int) {
+        OUTSIDE(0),
+        WALL(1),
+        INSIDE(2),
+        ENCLOSED(3)
+    }
 
     override fun part2(): Int {
 
-        drawResult(getConnectedLoop().history)
+        val loop = getHistoryAsCharArray(getConnectedLoop().history)
 
-        return -1
+        val enclosureMatrix = Array(loop.size) { Array(loop.size) { Status.OUTSIDE } }
+
+        for (x in 0..5) {
+            // Fill enclosure matrix
+            for (row in loop.indices) {
+                if (row == 0 || row == loop.size - 1) continue
+
+                var isOutside = true
+                for (col in loop[row].indices) {
+                    if (col == 0 || col == loop[row].size - 1) continue
+                    val char = loop[row][col]
+
+                    if (char == '0' && isOutside) continue
+
+                    isOutside = false
+
+                    if (char == '0') {
+                        if (
+                            enclosureMatrix[row - 1][col] == Status.WALL ||
+                            enclosureMatrix[row + 1][col] == Status.WALL ||
+                            enclosureMatrix[row][col - 1] == Status.WALL ||
+                            enclosureMatrix[row][col + 1] == Status.WALL
+                        ) {
+                            enclosureMatrix[row][col] = Status.INSIDE
+                        }
+                    } else {
+                        enclosureMatrix[row][col] = Status.WALL
+                    }
+
+                }
+            }
+        }
+
+//        enclosureMatrix.draw()
+
+
+        enclosureMatrix.reverse()
+
+        for (x in 0..3) {
+            for (row in enclosureMatrix.indices) {
+                if (row == 0 || row == loop.size - 1) continue
+
+                for (col in enclosureMatrix[row].indices) {
+                    if (col == 0 || col == loop[row].size - 1) continue
+
+                    val char = enclosureMatrix[row][col]
+
+                    // Don't care if not inside
+                    if (char != Status.INSIDE) continue
+
+                    if (enclosureMatrix[row - 1][col] == Status.WALL || enclosureMatrix[row][col - 1] == Status.WALL || enclosureMatrix[row][col + 1] == Status.WALL) {
+
+                        // Now check if none of the surrounding items are outside
+
+                        if (
+                            enclosureMatrix[row - 1][col] == Status.OUTSIDE ||
+                            enclosureMatrix[row + 1][col] == Status.OUTSIDE ||
+                            enclosureMatrix[row][col - 1] == Status.OUTSIDE ||
+                            enclosureMatrix[row][col + 1] == Status.OUTSIDE
+                        ) {
+                            continue
+                        }
+
+
+
+                        enclosureMatrix[row][col] = Status.ENCLOSED
+                    }
+                }
+            }
+        }
+
+        println("How about now???")
+
+//        enclosureMatrix.draw()
+
+        return enclosureMatrix.sumOf { it.count { s -> s == Status.ENCLOSED } }
     }
 
+    // 727 -> too high!
+    // 540 -> too High!
+    // 473 -> incorrect
+    // 398 -> incorrect
+    // 348 -> incorrect
+    // 338 -> incorrect
 
 
-    data class ConnectedResult(val connected: Boolean, val steps: Int, val history: List<Pair<Coordinate, Char>> = listOf())
+    data class ConnectedResult(
+        val connected: Boolean,
+        val steps: Int,
+        val history: List<Pair<Coordinate, Char>> = listOf()
+    )
 
     private fun isConnectedLoop(startingPoint: Coordinate, startingDirection: Direction): ConnectedResult {
         var previousPipe: Pipe? = null
@@ -68,11 +159,11 @@ class Day10 : Day<Int>(2023, 10) {
 
         while (true) {
 
-            if(matrix[currentLocation.row][currentLocation.col] == '.') return ConnectedResult(false, steps)
+            if (matrix[currentLocation.row][currentLocation.col] == '.') return ConnectedResult(false, steps)
 
 
             if (previousPipe == null) {
-                previousPipe = Pipe.fromChar( matrix[currentLocation.row][currentLocation.col])
+                previousPipe = Pipe.fromChar(matrix[currentLocation.row][currentLocation.col])
                 continue
             }
 
@@ -80,7 +171,7 @@ class Day10 : Day<Int>(2023, 10) {
 
 
             if (currentLocation == startingPoint) {
-                currentLocation = when(startingDirection) {
+                currentLocation = when (startingDirection) {
                     Direction.RIGHT -> currentLocation.nextColumn()
                     Direction.DOWN -> currentLocation.nextRow()
                     Direction.LEFT -> currentLocation.previousColumn()
@@ -89,12 +180,17 @@ class Day10 : Day<Int>(2023, 10) {
                 continue
             }
 
-            val currentPipe = Pipe.fromChar( matrix[currentLocation.row][currentLocation.col])
+            val currentPipe = Pipe.fromChar(matrix[currentLocation.row][currentLocation.col])
 
 
 
             if (previousPipe.connectsWith(currentPipe)) {
-                history.add(Pair(Coordinate(currentLocation.row, currentLocation.col), matrix[currentLocation.row][currentLocation.col]))
+                history.add(
+                    Pair(
+                        Coordinate(currentLocation.row, currentLocation.col),
+                        matrix[currentLocation.row][currentLocation.col]
+                    )
+                )
                 val next = try {
                     getNextCoordinate(currentLocation, currentDirection, currentPipe)
                 } catch (e: IllegalStateException) {
@@ -149,7 +245,7 @@ class Day10 : Day<Int>(2023, 10) {
                 Pipe.HORIZONTAL -> throw IllegalStateException("Impossible")
                 Pipe.SOUTH_WEST -> throw IllegalStateException("Impossible")
                 Pipe.SOUTH_EAST -> throw IllegalStateException("Impossible")
-                Pipe.START ->throw IllegalStateException("Impossible")
+                Pipe.START -> throw IllegalStateException("Impossible")
             }
 
             Direction.LEFT -> when (pipe) {
@@ -204,7 +300,7 @@ class Day10 : Day<Int>(2023, 10) {
         fun connectsWith(pipe: Pipe): Boolean {
             return when (this) {
                 VERTICAL -> when (pipe) {
-                    NORTH_EAST, NORTH_WEST, VERTICAL, SOUTH_WEST, SOUTH_EAST-> true
+                    NORTH_EAST, NORTH_WEST, VERTICAL, SOUTH_WEST, SOUTH_EAST -> true
                     else -> false
                 }
 
@@ -251,10 +347,10 @@ class Day10 : Day<Int>(2023, 10) {
         fun previousColumn() = Coordinate(row, col - 1)
     }
 
-    private fun getHistoryAsCharArray(history: List<Pair<Coordinate, Char>> ): Array<Array<Char>> {
+    private fun getHistoryAsCharArray(history: List<Pair<Coordinate, Char>>): Array<Array<Char>> {
         val ret = Array(sqrt(input.length.toDouble()).toInt()) { Array(sqrt(input.length.toDouble()).toInt()) { '0' } }
 
-        for(hist in history) {
+        for (hist in history) {
             val (coord, char) = hist
 
             ret[coord.row][coord.col] = char
@@ -263,12 +359,12 @@ class Day10 : Day<Int>(2023, 10) {
         return ret
     }
 
-    private fun drawResult(history: List<Pair<Coordinate, Char>> ) {
+    private fun drawResult(history: List<Pair<Coordinate, Char>>, transform: Boolean = true) {
         val m = getHistoryAsCharArray(history)
         for (row in m) {
             println()
             for (col in row) {
-                val char = when(col) {
+                val char = if (transform) when (col) {
                     '-' -> '\u2501'
                     '|' -> '\u2503'
                     'F' -> '\u250F'
@@ -276,11 +372,20 @@ class Day10 : Day<Int>(2023, 10) {
                     'L' -> '\u2517'
                     '7' -> '\u2513'
                     else -> col
-                }
+                } else col
 
                 print(char)
             }
         }
     }
 
+}
+
+fun Array<Array<Day10.Status>>.draw() {
+    for (row in indices) {
+        println()
+        for (col in this[row].indices) {
+            print(this[row][col].status)
+        }
+    }
 }
