@@ -7,44 +7,66 @@ import com.dennie170.common.getMatrix
 class Day10 : Day<Int>(2023, 10) {
 
     private lateinit var input: String
-    private val matrix by lazy { getMatrix(input.toCharArray()) }
+    private lateinit var matrix: Array<Array<Char>>
 
 
     override fun setUp() {
         input = super.readInput().replace("\n", "")
+        matrix =  getMatrix(input.toCharArray())
     }
 
     override fun part1(): Int {
 
-        var startingPosition = Coordinate.ZERO
-        var steps = 0
-        var previousPipe: Pipe? = null
+        for (row in matrix.indices) {
+            for (col in matrix.indices) {
+                val currentColumn = matrix[row][col]
+
+                if (currentColumn == 'S') {
+                    val connectedDown = isConnectedLoop(Coordinate(row , col+1), Direction.DOWN)
+
+                    if (connectedDown.connected) return (connectedDown.steps / 2) + 1
+
+                }
+            }
+        }
 
 
-        isConnectedLoop(Coordinate(1, 1))
 
         return -1
     }
 
     data class ConnectedResult(val connected: Boolean, val steps: Int)
 
-    private fun isConnectedLoop(startingPoint: Coordinate): ConnectedResult {
+    private fun isConnectedLoop(startingPoint: Coordinate, startingDirection: Direction): ConnectedResult {
         var previousPipe: Pipe? = null
         var currentLocation = startingPoint
 
-        var currentDirection = Direction.RIGHT
+        var currentDirection = startingDirection
         var steps = 0
 
         while (true) {
-            steps++
+
+            if(matrix[currentLocation.row][currentLocation.col] == '.') return ConnectedResult(false, steps)
+
             if (previousPipe == null) {
-                previousPipe = Pipe.fromChar(matrix[currentLocation.row][currentLocation.col])
+                previousPipe = Pipe.fromChar( matrix[currentLocation.row][currentLocation.col])
                 continue
             }
 
-            if(currentLocation == startingPoint) currentLocation = currentLocation.nextColumn()
+            steps++
 
-            val currentPipe = Pipe.fromChar(matrix[currentLocation.row][currentLocation.col])
+
+            if (currentLocation == startingPoint) {
+                currentLocation = when(startingDirection) {
+                    Direction.RIGHT -> currentLocation.nextColumn()
+                    Direction.DOWN -> currentLocation.nextRow()
+                    Direction.LEFT -> currentLocation.previousColumn()
+                    Direction.UP -> currentLocation.previousRow()
+                }
+                continue
+            }
+
+            val currentPipe = Pipe.fromChar( matrix[currentLocation.row][currentLocation.col])
 
             if (previousPipe.connectsWith(currentPipe)) {
                 val next = getNextCoordinate(currentLocation, currentDirection, currentPipe)
@@ -63,46 +85,59 @@ class Day10 : Day<Int>(2023, 10) {
     }
 
     // TODO: decide based on current pipe?
-    private fun getNextCoordinate(coordinate: Coordinate, direction: Direction, pipe: Pipe): Pair<Coordinate, Direction> {
+    private fun getNextCoordinate(
+        coordinate: Coordinate,
+        direction: Direction,
+        pipe: Pipe
+    ): Pair<Coordinate, Direction> {
         val newLocation = when (pipe) {
-            Pipe.VERTICAL -> if(direction == Direction.DOWN) coordinate.nextRow() else coordinate.previousRow()
-            Pipe.HORIZONTAL -> if(direction == Direction.RIGHT) coordinate.nextColumn() else coordinate.previousColumn()
-            Pipe.NORTH_EAST -> if(direction.isVertical()) coordinate.nextColumn() else coordinate.previousRow()
-            Pipe.NORTH_WEST -> if(direction.isVertical())  coordinate.previousColumn() else coordinate.previousRow()
-            Pipe.SOUTH_WEST -> if(direction.isHorizontal()) coordinate.nextRow() else coordinate.previousColumn()
-            Pipe.SOUTH_EAST -> if(direction.isHorizontal()) coordinate.nextRow() else coordinate.nextColumn()
+            Pipe.VERTICAL -> if (direction == Direction.DOWN) coordinate.nextRow() else coordinate.previousRow()
+            Pipe.HORIZONTAL -> if (direction == Direction.RIGHT) coordinate.nextColumn() else coordinate.previousColumn()
+            Pipe.NORTH_EAST -> if (direction.isVertical()) coordinate.nextColumn() else coordinate.previousRow()
+            Pipe.NORTH_WEST -> if (direction.isVertical()) coordinate.previousColumn() else coordinate.previousRow()
+            Pipe.SOUTH_WEST -> if (direction.isHorizontal()) coordinate.nextRow() else coordinate.previousColumn()
+            Pipe.SOUTH_EAST -> if (direction.isHorizontal()) coordinate.nextRow() else coordinate.nextColumn()
+            Pipe.START -> throw IllegalStateException("Impossible")
         }
 
-        val newDirection = when(direction) {
-            Direction.RIGHT -> when(pipe) {
+
+        val newDirection = when (direction) {
+            Direction.RIGHT -> when (pipe) {
                 Pipe.HORIZONTAL -> Direction.RIGHT
                 Pipe.NORTH_WEST -> Direction.UP
                 Pipe.SOUTH_WEST -> Direction.DOWN
-                Pipe.VERTICAL -> throw IllegalStateException("Impossible")
-                Pipe.NORTH_EAST -> throw IllegalStateException("Impossible")
-                Pipe.SOUTH_EAST -> throw IllegalStateException("Impossible")
+                Pipe.VERTICAL -> if(matrix[coordinate.row][coordinate.col] == 'S') Direction.UP else throw IllegalStateException("Impossible")
+                Pipe.NORTH_EAST -> if(matrix[coordinate.row][coordinate.col] == 'S') Direction.RIGHT else throw IllegalStateException("Impossible")
+                Pipe.SOUTH_EAST -> if(matrix[coordinate.row][coordinate.col] == 'S') Direction.RIGHT else throw IllegalStateException("Impossible")
+                Pipe.START -> throw IllegalStateException("Impossible")
             }
-            Direction.DOWN -> when(pipe) {
+
+            Direction.DOWN -> when (pipe) {
                 Pipe.VERTICAL -> Direction.DOWN
-                Pipe.NORTH_EAST ->Direction.RIGHT
+                Pipe.NORTH_EAST -> Direction.RIGHT
                 Pipe.NORTH_WEST -> Direction.LEFT
-                Pipe.HORIZONTAL -> throw IllegalStateException("Impossible")
-                Pipe.SOUTH_WEST -> throw IllegalStateException("Impossible")
-                Pipe.SOUTH_EAST -> throw IllegalStateException("Impossible")
+                Pipe.HORIZONTAL -> if(matrix[coordinate.row][coordinate.col] == 'S') Direction.RIGHT else throw IllegalStateException("Impossible")
+                Pipe.SOUTH_WEST -> if(matrix[coordinate.row][coordinate.col] == 'S') Direction.DOWN else throw IllegalStateException("Impossible")
+                Pipe.SOUTH_EAST -> if(matrix[coordinate.row][coordinate.col] == 'S') Direction.RIGHT else throw IllegalStateException("Impossible")
+                Pipe.START ->throw IllegalStateException("Impossible")
             }
-            Direction.LEFT -> when(pipe) {
+
+            Direction.LEFT -> when (pipe) {
                 Pipe.HORIZONTAL -> Direction.LEFT
                 Pipe.NORTH_EAST -> Direction.UP
                 Pipe.SOUTH_EAST -> Direction.DOWN
-                Pipe.VERTICAL -> throw IllegalStateException("Impossible")
-                Pipe.NORTH_WEST -> throw IllegalStateException("Impossible")
-                Pipe.SOUTH_WEST -> throw IllegalStateException("Impossible")
+                Pipe.VERTICAL -> if(matrix[coordinate.row][coordinate.col] == 'S') Direction.UP else throw IllegalStateException("Impossible")
+                Pipe.NORTH_WEST -> if(matrix[coordinate.row][coordinate.col] == 'S') Direction.UP else throw IllegalStateException("Impossible")
+                Pipe.SOUTH_WEST -> if(matrix[coordinate.row][coordinate.col] == 'S') Direction.DOWN else throw IllegalStateException("Impossible")
+                Pipe.START -> throw IllegalStateException("Impossible")
             }
-            Direction.UP ->  when(pipe) {
+
+            Direction.UP -> when (pipe) {
                 Pipe.VERTICAL -> Direction.UP
-                Pipe.HORIZONTAL -> throw IllegalStateException("Impossible")
-                Pipe.NORTH_EAST -> throw IllegalStateException("Impossible")
-                Pipe.NORTH_WEST -> throw IllegalStateException("Impossible")
+                Pipe.HORIZONTAL -> if(matrix[coordinate.row][coordinate.col] == 'S') Direction.RIGHT else throw IllegalStateException("Impossible")
+                Pipe.NORTH_EAST -> if(matrix[coordinate.row][coordinate.col] == 'S') Direction.UP else throw IllegalStateException("Impossible")
+                Pipe.NORTH_WEST -> if(matrix[coordinate.row][coordinate.col] == 'S') Direction.UP else throw IllegalStateException("Impossible")
+                Pipe.START -> throw IllegalStateException("Impossible")
                 Pipe.SOUTH_WEST -> Direction.LEFT
                 Pipe.SOUTH_EAST -> Direction.RIGHT
             }
@@ -137,12 +172,13 @@ class Day10 : Day<Int>(2023, 10) {
         NORTH_EAST('L'),
         NORTH_WEST('J'),
         SOUTH_WEST('7'),
-        SOUTH_EAST('F');
+        SOUTH_EAST('F'),
+        START('S');
 
         fun connectsWith(pipe: Pipe): Boolean {
             return when (this) {
                 VERTICAL -> when (pipe) {
-                    NORTH_EAST, NORTH_WEST, VERTICAL -> true
+                    NORTH_EAST, NORTH_WEST, VERTICAL, SOUTH_WEST-> true
                     else -> false
                 }
 
@@ -152,18 +188,20 @@ class Day10 : Day<Int>(2023, 10) {
                 }
 
                 NORTH_EAST, NORTH_WEST, SOUTH_WEST, SOUTH_EAST -> true
+                START -> true
             }
         }
 
         companion object {
             fun fromChar(char: Char): Pipe {
                 return when (char) {
-                    '|' -> Pipe.VERTICAL
-                    '-' -> Pipe.HORIZONTAL
-                    'L' -> Pipe.NORTH_EAST
-                    'J' -> Pipe.NORTH_WEST
-                    '7' -> Pipe.SOUTH_WEST
-                    'F' -> Pipe.SOUTH_EAST
+                    '|' -> VERTICAL
+                    '-' -> HORIZONTAL
+                    'L' -> NORTH_EAST
+                    'J' -> NORTH_WEST
+                    '7' -> SOUTH_WEST
+                    'F' -> SOUTH_EAST
+                    'S' -> START
                     else -> throw IllegalStateException("Pipe not legal")
                 }
             }
