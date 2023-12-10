@@ -2,6 +2,7 @@ package com.dennie170.challenges.year2023
 
 import com.dennie170.Day
 import com.dennie170.common.getMatrix
+import kotlin.math.sqrt
 
 
 class Day10 : Day<Int>(2023, 10) {
@@ -30,18 +31,21 @@ class Day10 : Day<Int>(2023, 10) {
                         maxSteps = connectedDown.steps
                     }
 
-                    if (connectedDown.connected) return (connectedDown.steps / 2)
+                    if (connectedDown.connected) {
+//                        drawResult(connectedDown.history)
+
+                        return (connectedDown.steps / 2)
+                    }
 
                 }
             }
         }
 
-
-
         return maxSteps
     }
 
-    data class ConnectedResult(val connected: Boolean, val steps: Int)
+
+    data class ConnectedResult(val connected: Boolean, val steps: Int, val history: List<Pair<Coordinate, Char>> = listOf())
 
     private fun isConnectedLoop(startingPoint: Coordinate, startingDirection: Direction): ConnectedResult {
         var previousPipe: Pipe? = null
@@ -50,9 +54,12 @@ class Day10 : Day<Int>(2023, 10) {
         var currentDirection = startingDirection
         var steps = 0
 
+        val history = mutableListOf<Pair<Coordinate, Char>>()
+
         while (true) {
 
             if(matrix[currentLocation.row][currentLocation.col] == '.') return ConnectedResult(false, steps)
+
 
             if (previousPipe == null) {
                 previousPipe = Pipe.fromChar( matrix[currentLocation.row][currentLocation.col])
@@ -74,7 +81,10 @@ class Day10 : Day<Int>(2023, 10) {
 
             val currentPipe = Pipe.fromChar( matrix[currentLocation.row][currentLocation.col])
 
+
+
             if (previousPipe.connectsWith(currentPipe)) {
+                history.add(Pair(Coordinate(currentLocation.row, currentLocation.col), matrix[currentLocation.row][currentLocation.col]))
                 val next = try {
                     getNextCoordinate(currentLocation, currentDirection, currentPipe)
                 } catch (e: IllegalStateException) {
@@ -86,7 +96,7 @@ class Day10 : Day<Int>(2023, 10) {
                 // calculate new direction
 
                 previousPipe = currentPipe
-                if (currentLocation == startingPoint) return ConnectedResult(true, steps)
+                if (currentLocation == startingPoint) return ConnectedResult(true, steps, history)
             } else {
                 return ConnectedResult(false, steps)
             }
@@ -234,4 +244,38 @@ class Day10 : Day<Int>(2023, 10) {
         fun previousRow() = Coordinate(row - 1, col)
         fun previousColumn() = Coordinate(row, col - 1)
     }
+
+    private fun drawResult(history: List<Pair<Coordinate, Char>> ) {
+
+        val m = Array(sqrt(input.length.toDouble()).toInt()) { Array(sqrt(input.length.toDouble()).toInt()) { '0' } }
+
+        for(hist in history) {
+            val (coord, char) = hist
+
+
+            m[coord.row][coord.col] = when(char) {
+                '-' -> '\u2501'
+                '|' -> '\u2503'
+                'F' -> '\u250F'
+                'J' -> '\u251B'
+                'L' -> '\u2517'
+                '7' -> '\u2513'
+                '0' -> ' '
+                else -> char
+            }
+        }
+
+
+        for (row in m) {
+            println()
+            for (col in row) {
+                if(col == '0')  {
+                    print(' ')
+                } else {
+                    print(col)
+                }
+            }
+        }
+    }
+
 }
