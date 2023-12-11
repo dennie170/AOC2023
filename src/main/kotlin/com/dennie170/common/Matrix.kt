@@ -1,5 +1,6 @@
 package com.dennie170.common
 
+import com.dennie170.challenges.year2023.Day10
 import kotlin.math.sqrt
 
 fun getMatrix(input: CharArray): Array<Array<Char>> {
@@ -17,4 +18,13 @@ fun getMatrix(input: CharArray): Array<Array<Char>> {
     }
 
     return matrix
+}
+
+fun Array<Array<Char>>.draw() {
+    for (row in indices) {
+        println()
+        for (col in this[row].indices) {
+            print(this[row][col])
+        }
+    }
 }
