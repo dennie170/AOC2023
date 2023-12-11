@@ -379,13 +379,13 @@ class Day10 : Day<Int>(2023, 10) {
         }
     }
 
-}
-
-fun Array<Array<Day10.Status>>.draw() {
-    for (row in indices) {
-        println()
-        for (col in this[row].indices) {
-            print(this[row][col].status)
+    private fun Array<Array<Status>>.draw() {
+        for (row in indices) {
+            println()
+            for (col in this[row].indices) {
+                print(this[row][col].status)
+            }
         }
     }
 }
+
