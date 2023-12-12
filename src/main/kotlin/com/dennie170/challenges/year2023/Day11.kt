@@ -8,7 +8,7 @@ import kotlin.math.exp
 class Day11 : Day<Long>(2023, 11) {
 
     companion object {
-        const val EXPANSION_SIZE = 1_000_000
+        const val EXPANSION_SIZE = 999_999
     }
 
     private lateinit var input: String
