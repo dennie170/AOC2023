@@ -20,7 +20,7 @@ fun getMatrix(input: CharArray): Array<Array<Char>> {
     return matrix
 }
 
-fun Array<Array<Char>>.draw() {
+fun Array<Array<Int>>.draw() {
     for (row in indices) {
         println()
         for (col in this[row].indices) {
