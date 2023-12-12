@@ -7,10 +7,6 @@ import kotlin.math.exp
 
 class Day11 : Day<Long>(2023, 11) {
 
-    companion object {
-        const val EXPANSION_SIZE = 999_999
-    }
-
     private lateinit var input: String
 
     override fun setUp() {
@@ -19,22 +15,11 @@ class Day11 : Day<Long>(2023, 11) {
 
 
     override fun part1(): Long {
-        val universe = prepareUniverse(getMatrix(input.toCharArray()))
-        val galaxies = getGalaxyPositions(universe)
+        return solve(1)
+    }
 
-        val pairs = galaxies.map { galaxy ->
-            val id = galaxy.key
-
-            var distance = 0L
-
-            for (i in ((id)..galaxies.size)) {
-                distance += getDistanceBetweenGalaxies(galaxies[id]!!, galaxies[i]!!)
-            }
-
-            distance
-        }
-
-        return pairs.sum()
+    override fun part2(): Long {
+        return solve(999_999) // Don't ask me why...
     }
 
     /**
@@ -61,47 +46,6 @@ class Day11 : Day<Long>(2023, 11) {
         return locations
     }
 
-
-    /**
-     * Walk over all rows and columns and expand if empty
-     */
-    private fun expandUniverse(universe: Universe): Universe {
-        val expanded = universe.map { it.toMutableList() }.toMutableList()
-
-        var addedRows = 0
-        for (row in expanded.indices) {
-            // Row is empty
-            if (universe[row].count { it == '#' } == 0) {
-                expanded.add(row + addedRows, ".".repeat(expanded[row + addedRows].size).toCharArray().toTypedArray().toMutableList())
-                addedRows++
-            }
-        }
-
-        var added = 0
-
-        // Loop over all columns
-        for (col in expanded[0].indices) {
-
-            val columns = mutableListOf<Char>()
-
-            for (row in expanded.indices) {
-                columns.add(expanded[row][col + added])
-            }
-
-            // This column is empty
-            if (columns.count { it == '#' } == 0) {
-                for (row in expanded.indices) {
-                    expanded[row].add(col + added, '.')
-                }
-
-                added++
-            }
-
-        }
-
-        return expanded.map { it.toTypedArray() }.toTypedArray()
-    }
-
     private fun numerateAllGalaxies(universe: Universe): NumeratedUniverse {
         var galaxy = 1
         val numerated = Array(universe.size) { Array(universe[0].size) { 0 } }
@@ -122,14 +66,11 @@ class Day11 : Day<Long>(2023, 11) {
         return numerated
     }
 
-    private fun prepareUniverse(universe: Universe) = numerateAllGalaxies(expandUniverse(universe))
-
     data class Position(val row: Long, val col: Long)
 
-
-    override fun part2(): Long {
+    private fun solve(expansion: Int): Long {
         val universe = getMatrix(input.toCharArray())
-        var galaxies = getGalaxyPositions(numerateAllGalaxies(universe))
+        val galaxies = getGalaxyPositions(numerateAllGalaxies(universe))
 
 
         // Expand all rows by a million
@@ -138,10 +79,10 @@ class Day11 : Day<Long>(2023, 11) {
             if (universe[row].none { it == '#' }) {
                 for (galaxy in galaxies) {
                     if (galaxy.value.row > (row + addedRows)) {
-                        galaxies[galaxy.key] = Position(galaxies[galaxy.key]!!.row + EXPANSION_SIZE, galaxies[galaxy.key]!!.col)
+                        galaxies[galaxy.key] = Position(galaxies[galaxy.key]!!.row + expansion, galaxies[galaxy.key]!!.col)
                     }
                 }
-                addedRows += EXPANSION_SIZE
+                addedRows += expansion
             }
         }
 
@@ -158,10 +99,10 @@ class Day11 : Day<Long>(2023, 11) {
             if (columns.none { it == '#' }) {
                 for (galaxy in galaxies) {
                     if (galaxy.value.col > (col + addedCols)) {
-                        galaxies[galaxy.key] = Position(galaxies[galaxy.key]!!.row, galaxies[galaxy.key]!!.col + EXPANSION_SIZE)
+                        galaxies[galaxy.key] = Position(galaxies[galaxy.key]!!.row, galaxies[galaxy.key]!!.col + expansion)
                     }
                 }
-                addedCols += EXPANSION_SIZE
+                addedCols += expansion
             }
 
         }
@@ -181,6 +122,8 @@ class Day11 : Day<Long>(2023, 11) {
 
         return pairs.sum()
     }
+
+
     // 1100647098 -> too low
     // 1100552268 -> too low
     // 1099821032 -> too low
