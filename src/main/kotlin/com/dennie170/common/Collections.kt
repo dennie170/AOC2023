@@ -11,3 +11,8 @@ fun <T> List<Set<T>>.intersectAll(): Set<T> {
 
     return result
 }
+
+// Returns all indexes of items that match predicate
+fun <E> Iterable<E>.indexesOf(e: (E) -> Boolean): List<Int> {
+    return mapIndexedNotNull { index, elem -> index.takeIf { e(elem) } }
+}
