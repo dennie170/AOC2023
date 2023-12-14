@@ -41,7 +41,7 @@ class Day13 : Day<Int>(2023, 13) {
         val firstResult = getReflection(first)
         val secondResult = getReflection(second)
 
-        return (firstResult + 1) + (secondResult + 2)
+        return firstResult + secondResult
     }
 
     private fun getReflection(block: Block): Int {
@@ -64,12 +64,19 @@ class Day13 : Day<Int>(2023, 13) {
         val horizontallyMirroredColumn = getMirroredColumn(block.toList().map { it.toList() })
 
 
-        return if (verticallyMirroredColumn - (columns.size / 2) > horizontallyMirroredColumn - (block.size / 2)) {
-            (100 * (verticallyMirroredColumn))
+        val verticalCloser = verticallyMirroredColumn - (columns.size / 2) > horizontallyMirroredColumn - (block.size / 2)
 
-        } else {
-            horizontallyMirroredColumn
+        return if (verticalCloser) {
+            (100 * (verticallyMirroredColumn)) + 1
 
+        } else if(verticallyMirroredColumn - (columns.size / 2) == horizontallyMirroredColumn - (block.size / 2)) { // same
+            if(verticallyMirroredColumn > horizontallyMirroredColumn) {
+                return (100 * (verticallyMirroredColumn)) + 1
+            } else {
+                horizontallyMirroredColumn + 1
+            }
+        }  else {
+            horizontallyMirroredColumn + 1
         }
 
 
