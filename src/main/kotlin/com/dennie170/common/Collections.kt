@@ -16,3 +16,5 @@ fun <T> List<Set<T>>.intersectAll(): Set<T> {
 fun <E> Iterable<E>.indexesOf(e: (E) -> Boolean): List<Int> {
     return mapIndexedNotNull { index, elem -> index.takeIf { e(elem) } }
 }
+
+data class Tuple2<A, B>(val t1: A, val t2: B)
