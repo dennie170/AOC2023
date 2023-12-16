@@ -37,7 +37,7 @@ class Day15 : Day<Int>(2023, 15) {
             val operator = if (instruction.contains('=')) '=' else '-'
 
             val operatorIndex = instruction.indexOf(operator)
-            val code = instruction.slice(0..<operatorIndex).toCharArray()
+            val code = instruction.slice(0..<operatorIndex)
             val box = hash(code)
 
             if (operator == '=') {
@@ -46,23 +46,23 @@ class Day15 : Day<Int>(2023, 15) {
 
 
                 if (boxes.containsKey(box)) {
-                    val lens = boxes[box]!!.indexOfFirst { it.code == String(code) }
+                    val lens = boxes[box]!!.indexOfFirst { it.code == charListToString(code) }
 
                     if (lens == -1) {
-                        boxes[box]!!.add(Lens(String(code), focalLength))
+                        boxes[box]!!.add(Lens(charListToString(code), focalLength))
 
                     } else {
                         boxes[box]!![lens] = boxes[box]!![lens].copy(focalLength = focalLength)
                     }
 
                 } else {
-                    boxes[box] = mutableListOf(Lens(String(code), focalLength))
+                    boxes[box] = mutableListOf(Lens(charListToString(code), focalLength))
                 }
             } else {
 
                 val lenses = boxes[box] ?: continue
 
-                val lens = lenses.find { it.code == String(code) } ?: continue
+                val lens = lenses.find { it.code == charListToString(code) } ?: continue
 
                 boxes[box]!!.remove(lens)
             }
@@ -80,7 +80,13 @@ class Day15 : Day<Int>(2023, 15) {
         }.sum()
     }
 
-    private fun hash(instruction: CharArray): Int {
+    private fun charListToString(list: List<Char>): String {
+        val sb = StringBuilder(list.size)
+        for(char in list) sb.append(char)
+        return sb.toString()
+    }
+
+    private fun hash(instruction: List<Char>): Int {
         var instructionResult = 0
         for (char in instruction) {
             instructionResult += char.code
