@@ -26,7 +26,68 @@ class Day15 : Day<Int>(2023, 15) {
         return result
     }
 
+    private val boxes = mutableMapOf<Int, MutableList<Lens>>()
+
+    data class Lens(val code: String, val focalLength: Int)
+
     override fun part2(): Int {
-        TODO("Not yet implemented")
+
+        for (instruction in input) {
+
+            val operator = if (instruction.contains('=')) '=' else '-'
+
+            val operatorIndex = instruction.indexOf(operator)
+            val code = instruction.slice(0..<operatorIndex).toCharArray()
+            val box = hash(code)
+
+            if (operator == '=') {
+                // Add lens to box
+                val focalLength = String(instruction.slice(operatorIndex + 1..<instruction.size).toCharArray()).toInt()
+
+
+                if (boxes.containsKey(box)) {
+                    val lens = boxes[box]!!.indexOfFirst { it.code == String(code) }
+
+                    if (lens == -1) {
+                        boxes[box]!!.add(Lens(String(code), focalLength))
+
+                    } else {
+                        boxes[box]!![lens] = boxes[box]!![lens].copy(focalLength = focalLength)
+                    }
+
+                } else {
+                    boxes[box] = mutableListOf(Lens(String(code), focalLength))
+                }
+            } else {
+
+                val lenses = boxes[box] ?: continue
+
+                val lens = lenses.find { it.code == String(code) } ?: continue
+
+                boxes[box]!!.remove(lens)
+            }
+        }
+
+        return boxes.map {
+            var value = 0
+
+            for (index in it.value.indices) {
+                val lens = it.value[index]
+                value += (it.key + 1) * (index + 1) * lens.focalLength
+            }
+
+            value
+        }.sum()
+    }
+
+    private fun hash(instruction: CharArray): Int {
+        var instructionResult = 0
+        for (char in instruction) {
+            instructionResult += char.code
+            instructionResult *= 17
+            instructionResult %= 256
+        }
+
+        return instructionResult
     }
 }
