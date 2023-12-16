@@ -1,6 +1,7 @@
 package com.dennie170.challenges.year2023
 
 import com.dennie170.Day
+import com.dennie170.common.charListToString
 
 class Day15 : Day<Int>(2023, 15) {
 
@@ -46,23 +47,23 @@ class Day15 : Day<Int>(2023, 15) {
 
 
                 if (boxes.containsKey(box)) {
-                    val lens = boxes[box]!!.indexOfFirst { it.code == charListToString(code) }
+                    val lens = boxes[box]!!.indexOfFirst { it.code == code.charListToString() }
 
                     if (lens == -1) {
-                        boxes[box]!!.add(Lens(charListToString(code), focalLength))
+                        boxes[box]!!.add(Lens(code.charListToString(), focalLength))
 
                     } else {
                         boxes[box]!![lens] = boxes[box]!![lens].copy(focalLength = focalLength)
                     }
 
                 } else {
-                    boxes[box] = mutableListOf(Lens(charListToString(code), focalLength))
+                    boxes[box] = mutableListOf(Lens(code.charListToString(), focalLength))
                 }
             } else {
 
                 val lenses = boxes[box] ?: continue
 
-                val lens = lenses.find { it.code == charListToString(code) } ?: continue
+                val lens = lenses.find { it.code == code.charListToString() } ?: continue
 
                 boxes[box]!!.remove(lens)
             }
@@ -78,12 +79,6 @@ class Day15 : Day<Int>(2023, 15) {
 
             value
         }.sum()
-    }
-
-    private fun charListToString(list: List<Char>): String {
-        val sb = StringBuilder(list.size)
-        for(char in list) sb.append(char)
-        return sb.toString()
     }
 
     private fun hash(instruction: List<Char>): Int {

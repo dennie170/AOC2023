@@ -18,3 +18,9 @@ fun <E> Iterable<E>.indexesOf(e: (E) -> Boolean): List<Int> {
 }
 
 data class Tuple2<A, B>(val t1: A, val t2: B)
+
+fun List<Char>.charListToString(): String {
+    val sb = StringBuilder(size)
+    for (char in this) sb.append(char)
+    return sb.toString()
+}
