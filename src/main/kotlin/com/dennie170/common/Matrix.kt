@@ -20,6 +20,20 @@ fun getMatrix(input: CharArray): Array<Array<Char>> {
     return matrix
 }
 
+fun getMatrix(input: List<Int>): Array<IntArray> {
+    val sqrt = sqrt(input.size.toDouble()).toInt()
+
+    val matrix: Array<IntArray> = Array(sqrt) { IntArray(sqrt) }
+
+    for (line in 0..<sqrt) {
+        for (col in 0..<sqrt) {
+            matrix[line][col] = input[col + (line * sqrt)]
+        }
+    }
+
+    return matrix
+}
+
 fun Array<Array<Int>>.draw() {
     for (row in indices) {
         println()
