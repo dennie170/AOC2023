@@ -7,12 +7,9 @@ import java.awt.Polygon
 class Day18 : Day<Int>(2023, 18) {
 
     private lateinit var input: Sequence<String>
-    private lateinit var matrix: Array<Array<Colour>>
-
 
     override fun setUp() {
         input = super.readInput().lineSequence()
-
     }
 
     override fun part1(): Int {
@@ -24,31 +21,23 @@ class Day18 : Day<Int>(2023, 18) {
         for (instruction in input.map(Instruction::parse)) {
             when (instruction.direction) {
                 Direction.UP -> {
-                    for (i in 0..<instruction.steps) {
-                        polygon.addPoint(y, x)
-                        y++
-                    }
+                    polygon.addPoint(y, x)
+                    y += instruction.steps
                 }
 
                 Direction.RIGHT -> {
-                    for (i in 0..<instruction.steps) {
-                        polygon.addPoint(y, x)
-                        x++
-                    }
+                    polygon.addPoint(y, x)
+                    x += instruction.steps
                 }
 
                 Direction.DOWN -> {
-                    for (i in 0..<instruction.steps) {
-                        polygon.addPoint(y, x)
-                        y--
-                    }
+                    polygon.addPoint(y, x)
+                    y -= instruction.steps
                 }
 
                 Direction.LEFT -> {
-                    for (i in 0..<instruction.steps) {
-                        polygon.addPoint(y, x)
-                        x--
-                    }
+                    polygon.addPoint(y, x)
+                    x -= instruction.steps
                 }
             }
         }
@@ -68,10 +57,23 @@ class Day18 : Day<Int>(2023, 18) {
 
         val zipped = polygon.xpoints.zip(polygon.ypoints).toSet()
 
+        val isWall: (x: Int, y: Int) -> Boolean = { x, y ->
+            zipped.windowed(2).any {
+                val xrange = if (it[0].first < it[1].first) it[0].first..it[1].first else it[0].first downTo it[1].first
+                val yrange = if (it[0].second < it[1].second) it[0].second..it[1].second else it[0].second downTo it[1].second
+
+                xrange.contains(x) && yrange.contains(y)
+            }
+        }
+
         for (x in x_min..x_max) {
             for (y in y_min..y_max) {
-                if (polygon.contains(x, y) || zipped.contains(Pair(x, y))) {
+                if (polygon.contains(x, y)) {
                     total++
+                } else {
+                    if (isWall(x, y)) {
+                        total++
+                    }
                 }
             }
         }
@@ -82,6 +84,36 @@ class Day18 : Day<Int>(2023, 18) {
 
     override fun part2(): Int {
         return -1
+        val polygon = Polygon()
+
+        var y = 0
+        var x = 0
+
+        for (instruction in input.map(Instruction::parsePart2)) {
+            when (instruction.direction) {
+                Direction.UP -> {
+                    polygon.addPoint(y, x)
+                    y += instruction.steps
+                }
+
+                Direction.RIGHT -> {
+                    polygon.addPoint(y, x)
+                    x += instruction.steps
+                }
+
+                Direction.DOWN -> {
+                    polygon.addPoint(y, x)
+                    y -= instruction.steps
+                }
+
+                Direction.LEFT -> {
+                    polygon.addPoint(y, x)
+                    x -= instruction.steps
+                }
+            }
+        }
+
+        return getPolygonSurface(polygon)
     }
 
 
@@ -100,6 +132,22 @@ class Day18 : Day<Int>(2023, 18) {
                 val col = line.substringAfter('#').substringBefore(')')
 
                 return Instruction(dir, s, Colour(col))
+            }
+
+            fun parsePart2(line: String): Instruction {
+                val hex = line.substringAfter('#').substringBefore(')')
+
+                val direction = when (hex.last()) {
+                    '3' -> Direction.UP
+                    '0' -> Direction.RIGHT
+                    '1' -> Direction.DOWN
+                    '2' -> Direction.LEFT
+                    else -> throw IllegalStateException()
+                }
+
+                val steps = Integer.decode("0x" + hex.substring(0, hex.length - 1))
+
+                return Instruction(direction, steps, Colour(hex))
             }
         }
     }
