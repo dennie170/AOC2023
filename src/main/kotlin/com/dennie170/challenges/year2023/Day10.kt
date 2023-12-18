@@ -2,6 +2,7 @@ package com.dennie170.challenges.year2023
 
 import com.dennie170.Day
 import com.dennie170.common.getMatrix
+import java.awt.Polygon
 import kotlin.math.sqrt
 
 
@@ -53,85 +54,29 @@ class Day10 : Day<Int>(2023, 10) {
     }
 
     override fun part2(): Int {
+        var total = 0
 
-        val loop = getHistoryAsCharArray(getConnectedLoop().history)
+        val loop = getConnectedLoop().history
+        val history = getHistoryAsCharArray(loop)
 
-        val enclosureMatrix = Array(loop.size) { Array(loop.size) { Status.OUTSIDE } }
+        val polygon = Polygon()
 
-        for (x in 0..5) {
-            // Fill enclosure matrix
-            for (row in loop.indices) {
-                if (row == 0 || row == loop.size - 1) continue
-
-                var isOutside = true
-                for (col in loop[row].indices) {
-                    if (col == 0 || col == loop[row].size - 1) continue
-                    val char = loop[row][col]
-
-                    if (char == '0' && isOutside) continue
-
-                    isOutside = false
-
-                    if (char == '0') {
-                        if (
-                            enclosureMatrix[row - 1][col] == Status.WALL ||
-                            enclosureMatrix[row + 1][col] == Status.WALL ||
-                            enclosureMatrix[row][col - 1] == Status.WALL ||
-                            enclosureMatrix[row][col + 1] == Status.WALL
-                        ) {
-                            enclosureMatrix[row][col] = Status.INSIDE
-                        }
-                    } else {
-                        enclosureMatrix[row][col] = Status.WALL
-                    }
-
-                }
-            }
+        for (l in loop) {
+            polygon.addPoint(l.first.col, l.first.row)
         }
 
-//        enclosureMatrix.draw()
-
-
-        enclosureMatrix.reverse()
-
-        for (x in 0..3) {
-            for (row in enclosureMatrix.indices) {
-                if (row == 0 || row == loop.size - 1) continue
-
-                for (col in enclosureMatrix[row].indices) {
-                    if (col == 0 || col == loop[row].size - 1) continue
-
-                    val char = enclosureMatrix[row][col]
-
-                    // Don't care if not inside
-                    if (char != Status.INSIDE) continue
-
-                    if (enclosureMatrix[row - 1][col] == Status.WALL || enclosureMatrix[row][col - 1] == Status.WALL || enclosureMatrix[row][col + 1] == Status.WALL) {
-
-                        // Now check if none of the surrounding items are outside
-
-                        if (
-                            enclosureMatrix[row - 1][col] == Status.OUTSIDE ||
-                            enclosureMatrix[row + 1][col] == Status.OUTSIDE ||
-                            enclosureMatrix[row][col - 1] == Status.OUTSIDE ||
-                            enclosureMatrix[row][col + 1] == Status.OUTSIDE
-                        ) {
-                            continue
-                        }
-
-
-
-                        enclosureMatrix[row][col] = Status.ENCLOSED
+        for (row in history.indices) {
+            for (col in history[0].indices) {
+                val char = history[row][col]
+                if (char == '0') {
+                    if(polygon.contains(col, row)) {
+                        total ++
                     }
                 }
             }
         }
 
-        println("How about now???")
-
-//        enclosureMatrix.draw()
-
-        return enclosureMatrix.sumOf { it.count { s -> s == Status.ENCLOSED } }
+        return total
     }
 
     // 727 -> too high!
