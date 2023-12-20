@@ -26,8 +26,9 @@ class Day20 : Day<Long>(2023, 20) {
         input = super.readInput().lineSequence()
     }
 
-    // 32000000 -> correct
-    // 16500000
+    private var totalHigh = 0L
+    private var totalLow = 0L
+
     override fun part1(): Long {
         modules = input.map(Module::parse).associateBy { it.name }
         flipflopsEnabled = modules.filter { it.value.type == SwitchType.FLIP_FLOP }.map { it.key to false }.toMap().toMutableMap()
@@ -45,25 +46,20 @@ class Day20 : Day<Long>(2023, 20) {
             cache[m] = mutableMapOf()
         }
 
-        var totalHigh = 0L
-        var totalLow = 0L
-
-//        for (i in 0..<1000) {
-        queue.offer(QueueItem("button", Pulse.LOW))
-
         var previousFlipflop: String? = null
 
-        while (queue.size > 0) {
-            val item = queue.poll()
+        for (i in 0..<1000) {
+            queue.offer(QueueItem("button", Pulse.LOW))
 
-            val result = sendPulse(previousFlipflop, item.module, item.pulse)
+            while (queue.size > 0) {
+                val item = queue.poll()
 
-            totalLow += result[Pulse.LOW]!!
-            totalHigh += result[Pulse.HIGH]!!
+                sendPulse(previousFlipflop, item.module, item.pulse)
 
-            if (modules.containsKey(item.module)) {
-                if (modules[item.module]!!.type == SwitchType.FLIP_FLOP) {
-                    previousFlipflop = item.module
+                if (modules.containsKey(item.module)) {
+                    if (modules[item.module]!!.type == SwitchType.FLIP_FLOP) {
+                        previousFlipflop = item.module
+                    }
                 }
             }
         }
@@ -71,21 +67,25 @@ class Day20 : Day<Long>(2023, 20) {
         return totalLow * totalHigh
     }
 
-    private fun sendPulse(from: String?, name: String, pulse: Pulse): Map<Pulse, Long> {
+    private fun sendPulse(from: String?, name: String, pulse: Pulse){
         if (name == "button") {
             queue.offer(QueueItem("broadcaster", pulse))
-            return Pulse.map(1L, 0L)
+            return
         }
 
-        val module = modules[name] ?: return Pulse.map(
-            if (pulse == Pulse.LOW) 1L else 0L,
-            if (pulse == Pulse.HIGH) 1L else 0L,
-        )
+
+        if(pulse == Pulse.LOW) {
+            totalLow++
+        } else {
+            totalHigh++
+        }
+
+        val module = modules[name] ?: return
 
         var newPulse = pulse
 
         if (module.type == SwitchType.FLIP_FLOP) {
-            if (pulse == Pulse.HIGH) return Pulse.map(0L, 1L)
+            if (pulse == Pulse.HIGH) return
 
             val enabled = isEnabled(name)
 
@@ -106,25 +106,11 @@ class Day20 : Day<Long>(2023, 20) {
             }
         }
 
-
-//        if (cache[name]!!.containsKey(pulse)) {
-//            return cache[name]!!
-//        }
-
         for (m in module.destinations) {
-            println("[${module.name}] -> $newPulse : $m")
-
             queue.offer(QueueItem(m, newPulse))
         }
 
-        val lowPulses = if (newPulse == Pulse.LOW) module.destinations.size.toLong() else 0L
-        val highPulses = if (newPulse == Pulse.HIGH) module.destinations.size.toLong() else 0L
-
-
-        return Pulse.map(
-            if (pulse == Pulse.LOW) lowPulses + 1 else 0,
-            if (pulse == Pulse.HIGH) highPulses + 1 else 0,
-        )
+        return
     }
 
     private fun isEnabled(flipflop: String): Boolean = flipflopsEnabled[flipflop]!!
@@ -163,10 +149,6 @@ class Day20 : Day<Long>(2023, 20) {
 
     private enum class Pulse {
         LOW, HIGH;
-
-        companion object {
-            fun map(low: Long, high: Long) = mapOf(LOW to low, HIGH to high)
-        }
     }
 
     private data class QueueItem(val module: String, val pulse: Pulse)
