@@ -28,7 +28,7 @@ class Day24 : Day<Long>(2023, 24) {
     }
 
     override fun part1(): Long {
-        val stones = input.map(::parseHailstone)
+        val stones = input.map(::parseHailstone).toList()
 
         val maxTime = stones.maxOf(::getNanosecondsToFlyOutOfTestArea)
 
@@ -43,7 +43,7 @@ class Day24 : Day<Long>(2023, 24) {
             for ((i, l) in lines.withIndex()) {
                 if (i == index) continue
                 if (line.intersectsLine(l)) {
-                    val point = getIntersectionPoint(line, l) ?: continue
+                    val point = line.getIntersectionPoint(l) ?: continue
 
                     if (TEST_AREA.contains(point) && (!intersections.contains(index to i) && !intersections.contains(i to index))) {
                         collisions++
@@ -67,8 +67,10 @@ class Day24 : Day<Long>(2023, 24) {
 
     private fun parseHailstone(line: String): Hailstone {
         return line.split('@')
-            .map { it.split(", ").map(String::trim).map(String::toLong) }
-            .map { x -> Vector3d(x[0], x[1], x[2]) }
+            .map {
+                val x = it.split(',').map { c -> c.trim().toLong() }
+                Vector3d(x[0], x[1], x[2])
+            }
             .let { (location, velocity) -> Hailstone(location, velocity) }
     }
 
