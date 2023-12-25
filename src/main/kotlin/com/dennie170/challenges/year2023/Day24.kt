@@ -10,7 +10,7 @@ import kotlin.math.abs
 
 class Day24 : Day<Long>(2023, 24) {
 
-    private lateinit var input: Sequence<String>
+    private lateinit var input: List<String>
 
     companion object {
         private val TEST_AREA = Area(
@@ -24,11 +24,11 @@ class Day24 : Day<Long>(2023, 24) {
     }
 
     override fun setUp() {
-        input = super.readInput().lineSequence()
+        input = super.readInput().lines()
     }
 
     override fun part1(): Long {
-        val stones = input.map(::parseHailstone).toList()
+        val stones = input.map(::parseHailstone)
 
         val maxTime = stones.maxOf(::getNanosecondsToFlyOutOfTestArea)
 
