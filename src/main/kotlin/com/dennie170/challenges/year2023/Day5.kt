@@ -75,7 +75,7 @@ class Day5 : Day<Long>(2023, 5) {
                 val matcher = Pattern.compile("([a-z-]+ map:\\n[0-9\\s]+)").matcher(input)
 
                 while (matcher.find()) {
-                    val lines = matcher.group(1).lines()
+                    val lines = matcher.group(1).lines().toMutableList()
                     val name = lines.removeFirst().substringBefore(' ')
                     val ranges = lines.filter(String::isNotEmpty).map {
                         val line = it.split(' ').filter(String::isNotEmpty)

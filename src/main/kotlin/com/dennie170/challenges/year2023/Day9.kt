@@ -52,7 +52,7 @@ class Day9 : Day<Int>(2023, 9) {
         // Walk over the list backwards, starting at [0,0,0...]
         for (list in input.reversed()) {
             valueToIncreaseWith += list.last()
-            list.addLast(valueToIncreaseWith)
+            list.toMutableList().addLast(valueToIncreaseWith)
         }
 
         return valueToIncreaseWith
