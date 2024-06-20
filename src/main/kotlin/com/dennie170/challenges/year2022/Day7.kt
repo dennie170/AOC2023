@@ -1,6 +1,7 @@
 package com.dennie170.challenges.year2022
 
 import com.dennie170.Day
+import kotlin.math.abs
 
 class Day7 : Day<Long>(2022, 7) {
 
@@ -58,7 +59,12 @@ class Day7 : Day<Long>(2022, 7) {
     // 23447523 -> too high
     // 95437 -> too low
     override fun part1(): Long {
+        runCommands()
 
+        return fileSystem.flatten().filter { it.getSize() <= 100000 }.sumOf { it.getSize() }
+    }
+
+    private fun runCommands() {
         for (line in input) {
             if (isCommand(line)) {
                 execute(line.substring(2))
@@ -66,12 +72,22 @@ class Day7 : Day<Long>(2022, 7) {
                 parseResponse(line)
             }
         }
-
-        return fileSystem.flatten().filter { it.getSize() <= 100000 }.sumOf { it.getSize() }
     }
 
     override fun part2(): Long {
-        return -1
+        cwd.clear()
+        fileSystem.items.clear()
+
+        runCommands()
+
+        val diskSize = 70000000
+        val minimumFreeSpaceNeeded = 30000000
+
+        val diskSpaceUsed = fileSystem.getSize()
+
+        val neededToRemove = abs(diskSize - diskSpaceUsed - minimumFreeSpaceNeeded)
+
+        return fileSystem.flatten().filter { it.getSize() >= neededToRemove }.minByOrNull { it.getSize() }!!.getSize()
     }
 }
 
