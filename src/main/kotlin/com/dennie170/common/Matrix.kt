@@ -1,6 +1,5 @@
 package com.dennie170.common
 
-import com.dennie170.challenges.year2023.Day10
 import kotlin.math.sqrt
 
 fun getMatrix(input: CharArray): Array<Array<Char>> {
