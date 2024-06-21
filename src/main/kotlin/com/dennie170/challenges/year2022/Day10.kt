@@ -3,7 +3,7 @@ package com.dennie170.challenges.year2022
 import com.dennie170.Day
 
 
-class Day10 : Day<Int>(2022, 9) {
+class Day10 : Day<Int>(2022, 10) {
 
     private lateinit var input: String
 
