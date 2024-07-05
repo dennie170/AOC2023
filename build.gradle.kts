@@ -1,7 +1,9 @@
 plugins {
     kotlin("jvm") version "2.0.0"
+    id("org.graalvm.buildtools.native") version "0.10.2"
     application
 }
+
 
 group = "org.dennie170"
 version = "1.0-SNAPSHOT"
@@ -19,7 +21,7 @@ tasks.test {
 }
 
 kotlin {
-    jvmToolchain(22)
+    jvmToolchain(21)
 }
 
 application {
