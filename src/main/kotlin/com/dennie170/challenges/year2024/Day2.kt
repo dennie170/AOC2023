@@ -1,6 +1,10 @@
 package com.dennie170.challenges.year2024
 
 import com.dennie170.Day
+import com.dennie170.common.areAllDecreasing
+import com.dennie170.common.areAllIncreasing
+import com.dennie170.common.containsDuplicates
+import com.dennie170.common.maxDifferenceBetweenItems
 
 class Day2 : Day<Int>(2024, 2) {
 
@@ -11,47 +15,12 @@ class Day2 : Day<Int>(2024, 2) {
             it.map { r -> r.toInt() }
         }
 
-        var mode: Char? = null
-        var unsafeReports = 0
+       return reports.filter {
+           (it.areAllIncreasing() || it.areAllDecreasing())
+                   && !it.containsDuplicates()
+                   && it.maxDifferenceBetweenItems() <= 3
 
-        for (report in reports) {
-
-            for (i in 0..report.size) {
-                if(i+1 == report.size) break
-
-                if (report[i] == report[i + 1]) {
-                    unsafeReports++
-                    break
-                }
-
-                if (report[i + 1] > report[i]) {
-                    if(mode == 'd') {
-                        unsafeReports++
-                        break
-                    }
-
-                    mode = 'i'
-                    if (report[i + 1] > report[i] + 3) {
-                        unsafeReports++
-                        break
-                    }
-                } else if (report[i + 1] < report[i]) {
-                    if(mode == 'i') {
-                        unsafeReports++
-                        break
-                    }
-
-                    mode = 'd'
-                    if (report[i + 1] < report[i] - 3) {
-                        unsafeReports++
-                        break
-                    }
-                }
-            }
-            mode = null
-        }
-
-        return reports.size - unsafeReports
+       }.size
     }
 
 
