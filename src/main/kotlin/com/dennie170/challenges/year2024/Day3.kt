@@ -6,10 +6,9 @@ class Day3 : Day<Int>(2024, 3) {
 
     val input: String = readInput()
 
-    private val regex = Regex("mul\\(([0-9]+,[0-9]+)\\)")
 
     override fun part1(): Int {
-        val matches = regex.findAll(input)
+        val matches = Regex("mul\\(([0-9]+,[0-9]+)\\)").findAll(input)
 
         var total = 0
 
