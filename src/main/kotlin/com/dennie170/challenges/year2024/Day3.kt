@@ -6,10 +6,9 @@ class Day3 : Day<Int>(2024, 3) {
 
     val input: String = readInput()
 
+    private val regex = Regex("mul\\(([0-9]+,[0-9]+)\\)")
+
     override fun part1(): Int {
-
-        val regex = Regex("mul\\(([0-9]+,[0-9]+)\\)")
-
         val matches = regex.findAll(input)
 
         var total = 0
@@ -24,7 +23,30 @@ class Day3 : Day<Int>(2024, 3) {
     }
 
     override fun part2(): Int {
-        TODO()
+        val operations = input.split("don't()")
+
+        var enabled = true
+        var total = 0
+
+        for (op in operations) {
+            val matches = Regex("mul\\(([0-9]+,[0-9]+)\\)|do\\(\\)").findAll(op)
+            for (match in matches) {
+                if (match.groups[0]!!.value == "do()") {
+                    enabled = true
+                    continue
+                }
+
+                if (enabled) {
+                    val numbers = match.groups[1]!!.value.split(',').map { it.toInt() }
+
+                    total += (numbers[0] * numbers[1])
+                }
+            }
+
+            enabled = false
+        }
+
+        return total
     }
 
 
