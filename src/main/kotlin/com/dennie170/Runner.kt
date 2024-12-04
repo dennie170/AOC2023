@@ -6,13 +6,13 @@ class Runner {
     companion object {
        @JvmStatic fun main(args: Array<String>) {
 //            runAll()
-             runDay(2024, 3)
+             runDay(2024, 4)
         }
 
         private fun runAll() {
             var totalDuration = Duration.ZERO
 
-            for (year in 2022..2023) {
+            for (year in 2022..2024) {
                 var yearDuration = Duration.ZERO
 
                 for (day in 1..31) {
@@ -33,8 +33,6 @@ class Runner {
         private fun runDay(year: Int, day: Int): Duration {
             val clazz = Any::class::class.java.classLoader.loadClass("com.dennie170.challenges.year${year}.Day$day")
             val dayInstance = clazz.getConstructor().newInstance() as Day<*>
-
-            dayInstance.setUp()
 
             return runDayMeasured(dayInstance)
         }

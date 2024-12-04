@@ -11,6 +11,13 @@ const val blue = "\u001b[94m"
 
 fun <T> runDayMeasured(day: Day<T>): Duration {
     println("${yellow}Running Day ${day.day}:$reset")
+
+    val setupTime = measureTime {
+        day.setUp()
+    }
+
+    println("  ${yellow}Setup [$blue${setupTime}$reset]")
+
     var part1Result: T
     var part2Result: T
 
