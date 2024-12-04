@@ -2,6 +2,7 @@ package com.dennie170.challenges.year2024
 
 import com.dennie170.Day
 import com.dennie170.common.getMatrix
+import com.dennie170.common.isEither
 
 class Day4 : Day<Int>(2024, 4) {
 
@@ -111,7 +112,28 @@ class Day4 : Day<Int>(2024, 4) {
         return matches
     }
 
+    // 2859 -> too high
     override fun part2(): Int {
-        TODO()
+        val aCoordinates = mutableSetOf<Coordinates>()
+
+        for ((rowIndex, row) in matrix.withIndex()) {
+            for ((colIndex, col) in row.withIndex()) {
+                if (col == 'A') aCoordinates.add(Coordinates(rowIndex, colIndex))
+            }
+        }
+
+        return aCoordinates.count { coordinates ->
+            try {
+                ((matrix[coordinates.row - 1][coordinates.col - 1].isEither('M', 'S'))
+                        && (matrix[coordinates.row - 1][coordinates.col + 1].isEither('M', 'S'))
+                        && (matrix[coordinates.row + 1][coordinates.col - 1].isEither('M', 'S'))
+                        && (matrix[coordinates.row + 1][coordinates.col + 1].isEither('M', 'S'))
+                        && (matrix[coordinates.row + 1][coordinates.col - 1] != matrix[coordinates.row - 1][coordinates.col + 1]) // left bottom may not match right top
+                        && (matrix[coordinates.row - 1][coordinates.col - 1] != matrix[coordinates.row + 1][coordinates.col + 1])) // left bottom may not match right top
+                // left top may not match right bottom
+            } catch(_: ArrayIndexOutOfBoundsException) {
+                false
+            }
+        }
     }
 }
