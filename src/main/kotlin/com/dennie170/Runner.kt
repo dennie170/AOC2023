@@ -7,24 +7,14 @@ class Runner {
        @JvmStatic fun main(args: Array<String>) {
 //            runAll()
              runDay(2024, 5)
+//           runYear(2024)
         }
 
         private fun runAll() {
             var totalDuration = Duration.ZERO
 
             for (year in 2022..2024) {
-                var yearDuration = Duration.ZERO
-
-                for (day in 1..31) {
-                    try {
-                        yearDuration += runDay(year, day)
-                    } catch (_: ClassNotFoundException) {
-                    }
-                }
-
-                println("${yellow}Year $year took: $blue$yearDuration")
-
-                totalDuration += yearDuration
+                totalDuration += runYear(year)
             }
 
             println("${yellow}TOTAL TIME TAKEN: $blue$totalDuration")
@@ -35,6 +25,21 @@ class Runner {
             val dayInstance = clazz.getConstructor().newInstance() as Day<*>
 
             return runDayMeasured(dayInstance)
+        }
+
+        private fun runYear(year: Int): Duration {
+            var yearDuration = Duration.ZERO
+
+            for (day in 1..31) {
+                try {
+                    yearDuration += runDay(year, day)
+                } catch (_: ClassNotFoundException) {
+                }
+            }
+
+            println("${yellow}Year $year took: $blue$yearDuration")
+
+            return yearDuration
         }
 
     }

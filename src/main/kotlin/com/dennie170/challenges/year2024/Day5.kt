@@ -9,62 +9,57 @@ class Day5 : Day<Int>(2024, 5) {
     override fun part1(): Int {
         val (ruleInput, pageProductionInput) = input.split("\n\n")
 
-        val rules = ruleInput.split('\n').map {
-            val split = it.split('|').map { page -> page.toInt() }
-            split[0] to split[1]
-        }.toSet()
+        val rules = getRules(ruleInput)
 
-        val pageProductions = pageProductionInput.split('\n').map {
-            it.split(',').map { page -> page.toInt() }
-        }
+        val pageProductions = getPageProductions(pageProductionInput)
 
         return pageProductions.filter { isValidSequence(rules, it).result }.sumOf {
             it[(it.size / 2)]
         }
-
     }
 
     override fun part2(): Int {
         val (ruleInput, pageProductionInput) = input.split("\n\n")
 
-        val rules = ruleInput.split('\n').map {
+        val rules = getRules(ruleInput)
+
+        return getPageProductions(pageProductionInput)
+            .mapNotNull {
+                val result = isValidSequence(rules, it)
+
+                if (result.result) return@mapNotNull null
+
+                val reordered = it.toMutableList()
+
+                var isValid = result
+
+                while (!isValid.result) {
+                    val failedFirstIndex = reordered.indexOf(isValid.failedPair!!.first)
+                    val failedSecondIndex = reordered.indexOf(isValid.failedPair!!.second)
+
+                    reordered[failedFirstIndex] = isValid.failedPair!!.second
+                    reordered[failedSecondIndex] = isValid.failedPair!!.first
+
+                    isValid = isValidSequence(rules, reordered)
+                }
+
+                reordered
+            }.sumOf {
+                it[it.size / 2]
+            }
+    }
+
+    private fun getPageProductions(pageProductionInput: String): List<List<Int>> {
+        return pageProductionInput.split('\n').map {
+            it.split(',').map { page -> page.toInt() }
+        }
+    }
+
+    private fun getRules(ruleInput: String): Set<Pair<Int, Int>> {
+        return ruleInput.split('\n').map {
             val split = it.split('|').map { page -> page.toInt() }
             split[0] to split[1]
         }.toSet()
-
-        val pageProductions = pageProductionInput.split('\n').map {
-            it.split(',').map { page -> page.toInt() }
-        }
-
-        val faulty = pageProductions.filter {
-            for (window in it.windowed(2)) {
-                if (!rules.contains(Pair(window[0], window[1]))) {
-                    return@filter true
-                }
-            }
-
-            false
-        }
-
-        return faulty.map {
-            val reordered = it.toMutableList()
-
-            var isValid = isValidSequence(rules, reordered)
-
-            while (!isValid.result) {
-                val failedFirstIndex = reordered.indexOf(isValid.failedPair!!.first)
-                val failedSecondIndex = reordered.indexOf(isValid.failedPair!!.second)
-
-                reordered[failedFirstIndex] = isValid.failedPair!!.second
-                reordered[failedSecondIndex] = isValid.failedPair!!.first
-
-                isValid = isValidSequence(rules, reordered)
-            }
-
-            reordered
-        }.sumOf {
-            it[it.size / 2]
-        }
     }
 
     private data class IsValidResponse(val result: Boolean, val failedPair: Pair<Int, Int>?)
