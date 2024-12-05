@@ -8,45 +8,39 @@ class Day3 : Day<Int>(2024, 3) {
 
 
     override fun part1(): Int {
-        val matches = Regex("mul\\(([0-9]+,[0-9]+)\\)").findAll(input)
+        return Regex("mul\\((\\d+),(\\d+)\\)").findAll(input).sumOf { match ->
+            val first = match.groups[1]!!.value.toInt()
+            val second = match.groups[2]!!.value.toInt()
 
-        var total = 0
-
-        for (match in matches) {
-            val numbers = match.groups[1]!!.value.split(',').map { it.toInt() }
-
-            total += (numbers[0] * numbers[1])
+            first * second
         }
-
-        return total
     }
 
     override fun part2(): Int {
-        val operations = input.split("don't()")
-
         var enabled = true
         var total = 0
 
-        for (op in operations) {
-            val matches = Regex("mul\\(([0-9]+,[0-9]+)\\)|do\\(\\)").findAll(op)
-            for (match in matches) {
-                if (match.groups[0]!!.value == "do()") {
-                    enabled = true
-                    continue
-                }
+        val matches = Regex("don't\\(\\)|mul\\(([0-9]+),([0-9]+)\\)|do\\(\\)").findAll(input)
 
-                if (enabled) {
-                    val numbers = match.groups[1]!!.value.split(',').map { it.toInt() }
-
-                    total += (numbers[0] * numbers[1])
-                }
+        for (match in matches) {
+            if (match.groups[0]!!.value == "don't()") {
+                enabled = false
+                continue
             }
 
-            enabled = false
+            if (match.groups[0]!!.value == "do()") {
+                enabled = true
+                continue
+            }
+
+            if (enabled) {
+                val first = match.groups[1]!!.value.toInt()
+                val second = match.groups[2]!!.value.toInt()
+
+                total += first * second
+            }
         }
 
         return total
     }
-
-
 }
