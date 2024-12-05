@@ -41,3 +41,4 @@ bin/
 
 # Graalvm
 src/main/resources/META-INF/native-image/
+./Runner
