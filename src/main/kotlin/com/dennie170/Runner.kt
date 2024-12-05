@@ -6,7 +6,7 @@ class Runner {
     companion object {
        @JvmStatic fun main(args: Array<String>) {
 //            runAll()
-             runDay(2024, 5)
+             runDay(2024, 1)
 //           runYear(2024)
         }
 

@@ -7,7 +7,7 @@ class Day1 : Day<Int>(2024, 1) {
     val lines: List<String> = readInput().lines()
 
     private fun parseLine(line: String): Pair<Int, Int> {
-        return line.substringBefore(' ').toInt() to line. substringAfter(' ').trim(' ').toInt()
+        return line.substring(0..4).toInt() to line.substring(8..12).toInt()
     }
 
     override fun part1(): Int {
@@ -24,11 +24,15 @@ class Day1 : Day<Int>(2024, 1) {
 
     override fun part2(): Int {
         val pairs = lines.map { parseLine(it) }
-        val left = pairs.map { it.first }.sorted()
-        val right = pairs.map { it.second }.sorted()
+        val left = pairs.map { it.first }
+        val right = mutableMapOf<Int, Int>()
+
+        for(p in pairs) {
+            right[p.second] = right[p.second]?.or(0)?.plus(1) ?: 1
+        }
 
         return left.sumOf {
-            right.count { r -> r == it } * it
+            right[it]?.or(0)?.times(it) ?: 0
         }
     }
 }
