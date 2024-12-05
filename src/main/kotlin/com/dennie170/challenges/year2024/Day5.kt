@@ -18,16 +18,7 @@ class Day5 : Day<Int>(2024, 5) {
             it.split(',').map { page -> page.toInt() }
         }
 
-        return pageProductions.filter {
-            for (window in it.windowed(2)) {
-                if (!rules.contains(Pair(window[0], window[1]))) {
-                    return@filter false
-                }
-            }
-
-            true
-
-        }.sumOf {
+        return pageProductions.filter { isValidSequence(rules, it).result }.sumOf {
             it[(it.size / 2)]
         }
 
