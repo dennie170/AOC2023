@@ -8,7 +8,7 @@ Build the jar file first:
 
 Next run the jar file to obtain all reflection data:
 ```
-java -agentlib:native-image-agent=config-output-dir=src/main/resources/META-INF/native-image -jar build/libs/aoc-1.0-SNAPSHOT.jar
+ /Users/dennis.vandervelde/Library/Java/JavaVirtualMachines/graalvm-ce-21.0.2/Contents/Home/bin/java -agentlib:native-image-agent=config-output-dir=src/main/resources/META-INF/native-image -jar build/libs/aoc-1.0-SNAPSHOT.jar
 ```
 
 Finally, build the Runner executable:
