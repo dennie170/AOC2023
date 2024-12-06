@@ -14,6 +14,7 @@ class Day6 : Day<Int>(2024, 6) {
     }
 
     data class Coordinates(val row: Int, val col: Int)
+    data class Location(val direction: Direction, val coordinates: Coordinates)
 
     enum class Direction {
         RIGHT,
@@ -54,14 +55,21 @@ class Day6 : Day<Int>(2024, 6) {
     private fun findStartingPosition() {
         for (row in matrix.indices) {
             for (col in matrix.indices) {
-                if (matrix[row][col] == '^') currentPosition = Coordinates(row, col)
+                if (matrix[row][col] == '^') {
+                    currentPosition = Coordinates(row, col)
+                    return
+                }
             }
         }
+
+        throw IllegalStateException("Can't find starting position")
     }
 
     private fun walkUp() {
         for (row in currentPosition.row - 1 downTo 0) {
-            currentRoute.add(Pair(currentDirection, currentPosition))
+            if (part == 2) {
+                currentRoute.add(Location(currentDirection, currentPosition))
+            }
 
             if (matrix[row][currentPosition.col] == '#' || Coordinates(row, currentPosition.col) == extraObstruction) {
                 break
@@ -69,17 +77,15 @@ class Day6 : Day<Int>(2024, 6) {
 
             if (row - 1 < 0) {
                 outOfBounds = true
-                break
+                return
             }
-
-
 
             currentPosition = currentPosition.copy(row = row)
             positions.add(currentPosition)
 
-            if (part == 2 && currentRoute.contains(Pair(currentDirection, currentPosition))) {
+            if (part == 2 && currentRoute.contains(Location(currentDirection, currentPosition))) {
                 isInfiniteRoute = true
-                break
+                return
             }
         }
 
@@ -88,7 +94,9 @@ class Day6 : Day<Int>(2024, 6) {
 
     private fun walkDown() {
         for (row in currentPosition.row + 1..<matrix.size) {
-            currentRoute.add(Pair(currentDirection, currentPosition))
+            if (part == 2) {
+                currentRoute.add(Location(currentDirection, currentPosition))
+            }
 
             if (matrix[row][currentPosition.col] == '#' || Coordinates(row, currentPosition.col) == extraObstruction) {
                 break
@@ -96,17 +104,15 @@ class Day6 : Day<Int>(2024, 6) {
 
             if (row + 1 >= matrix.size) {
                 outOfBounds = true
-                break
+                return
             }
-
-
 
             currentPosition = currentPosition.copy(row = row)
             positions.add(currentPosition)
 
-            if (part == 2 && currentRoute.contains(Pair(currentDirection, currentPosition))) {
+            if (part == 2 && currentRoute.contains(Location(currentDirection, currentPosition))) {
                 isInfiniteRoute = true
-                break
+                return
             }
         }
 
@@ -116,7 +122,9 @@ class Day6 : Day<Int>(2024, 6) {
     private fun walkLeft() {
         for (col in currentPosition.col - 1 downTo 0) {
 
-            currentRoute.add(Pair(currentDirection, currentPosition))
+            if (part == 2) {
+                currentRoute.add(Location(currentDirection, currentPosition))
+            }
 
             if (matrix[currentPosition.row][col] == '#' || Coordinates(currentPosition.row, col) == extraObstruction) {
                 break
@@ -124,7 +132,7 @@ class Day6 : Day<Int>(2024, 6) {
 
             if (col - 1 < 0) {
                 outOfBounds = true
-                break
+                return
             }
 
 
@@ -132,9 +140,9 @@ class Day6 : Day<Int>(2024, 6) {
             positions.add(currentPosition)
 
 
-            if (part == 2 && currentRoute.contains(Pair(currentDirection, currentPosition))) {
+            if (part == 2 && currentRoute.contains(Location(currentDirection, currentPosition))) {
                 isInfiniteRoute = true
-                break
+                return
             }
         }
 
@@ -143,7 +151,9 @@ class Day6 : Day<Int>(2024, 6) {
 
     private fun walkRight() {
         for (col in currentPosition.col + 1..<matrix.size) {
-            currentRoute.add(Pair(currentDirection, currentPosition))
+            if (part == 2) {
+                currentRoute.add(Location(currentDirection, currentPosition))
+            }
 
             if (matrix[currentPosition.row][col] == '#' || Coordinates(currentPosition.row, col) == extraObstruction) {
                 break
@@ -151,18 +161,15 @@ class Day6 : Day<Int>(2024, 6) {
 
             if (col + 1 >= matrix.size) {
                 outOfBounds = true
-                break
+                return
             }
-
-
-
 
             currentPosition = currentPosition.copy(col = col)
             positions.add(currentPosition)
 
-            if (part == 2 && currentRoute.contains(Pair(currentDirection, currentPosition))) {
+            if (part == 2 && currentRoute.contains(Location(currentDirection, currentPosition))) {
                 isInfiniteRoute = true
-                break
+                return
             }
         }
 
@@ -170,8 +177,7 @@ class Day6 : Day<Int>(2024, 6) {
     }
 
     private var infiniteLoops = 0
-    private val currentRoute = mutableSetOf<Pair<Direction, Coordinates>>()
-    private val infiniteLoopPositions = mutableSetOf<Coordinates>()
+    private val currentRoute = mutableSetOf<Location>()
     private var isInfiniteRoute = false
 
     override fun part2(): Int {
@@ -199,7 +205,6 @@ class Day6 : Day<Int>(2024, 6) {
                 currentPosition = startingPosition
                 isInfiniteRoute = false
 
-
                 while (true) {
 
                     when (currentDirection) {
@@ -217,13 +222,12 @@ class Day6 : Day<Int>(2024, 6) {
 
                     if (isInfiniteRoute) {
                         infiniteLoops++
-                        infiniteLoopPositions.add(extraObstruction)
                         break
                     }
                 }
             }
         }
 
-        return infiniteLoopPositions.size
+        return infiniteLoops
     }
 }

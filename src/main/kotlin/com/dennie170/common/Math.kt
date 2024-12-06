@@ -42,3 +42,5 @@ fun IntRange.Companion.areCompletelyOverlapping(a: IntRange, b: IntRange): Boole
 fun IntRange.Companion.areSomewhatOverlapping(a: IntRange, b: IntRange): Boolean {
     return a.contains(b.first) || a.contains(b.last) || b.contains(a.first) || b.contains(a.last)
 }
+
+fun Int.squared() = this * this
