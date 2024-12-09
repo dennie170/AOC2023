@@ -6,6 +6,8 @@ class Day9 : Day<Long>(2024, 9) {
 
     val input: String = readInput()
 
+    private var part = 1
+
     private abstract class HddEntity(length: Int) {
         abstract val length: Int
 
@@ -19,6 +21,8 @@ class Day9 : Day<Long>(2024, 9) {
     }
 
     private data class File(val id: Int, override val length: Int) : HddEntity(length) {
+        var isProcessed = false
+
         override fun shrink(): File {
             return copy(length = length - 1)
         }
@@ -58,26 +62,25 @@ class Day9 : Day<Long>(2024, 9) {
             return true
         }
 
-        fun removeLastFile(): File {
+        fun getLastFileIndex(): Int {
             for (i in size - 1 downTo 0) {
-                if (this[i] is File) {
-                    return removeAt(i) as File
+                if (this[i] is File && !(this[i] as File).isProcessed) {
+                    return i
                 }
             }
 
             throw IllegalStateException("No file left on HDD?")
         }
 
-        fun removeFirstFreeSpace(): FreeSpace {
-            for (i in 0..<size) {
-                if (this[i] is FreeSpace) {
-                    return removeAt(i) as FreeSpace
+        fun removeLastFile(part2: Boolean = false): File {
+            for (i in size - 1 downTo 0) {
+                if ((!part2 && this[i] is File) || (part2 && this[i] is File && !(this[i] as File).isProcessed)) {
+                    return removeAt(i) as File
                 }
             }
 
-            throw IllegalStateException("No free space left on HDD")
+            throw IllegalStateException("No file left on HDD?")
         }
-
     }
 
     private fun parseHardDriveContents(): Harddrive {
@@ -128,7 +131,6 @@ class Day9 : Day<Long>(2024, 9) {
             if (lastFile.length > 1) {
                 hardDrive.addLast(lastFile.shrink())
             }
-
         }
 
         var checksum = 0L
@@ -148,6 +150,98 @@ class Day9 : Day<Long>(2024, 9) {
 
 
     override fun part2(): Long {
-        TODO()
+
+        part = 2
+
+        val hardDrive = parseHardDriveContents()
+
+
+        hardDrive[0] = (hardDrive[0] as File).apply { isProcessed = true }
+
+        var blockinfiniteLoop = false
+
+
+        while (!hardDrive.isDefragmentated()) {
+            // Dequeue the last file from disk
+            val lastFileIndex = try {
+                hardDrive.getLastFileIndex()
+            } catch (e: IllegalStateException) {
+                -1
+            }
+
+            if (lastFileIndex == 0) {
+                break
+            }
+
+            if (lastFileIndex == -1 && !blockinfiniteLoop) {
+                blockinfiniteLoop = true
+                continue
+            }
+
+
+
+            if (blockinfiniteLoop) {
+                break
+            }
+
+            val lastFile = hardDrive[lastFileIndex] as File
+            if (lastFile.isProcessed) continue
+
+            lastFile.isProcessed = true
+
+
+            // Find the first available free space on the left
+            val firstFreeSpaceIndex = hardDrive.indexOfFirst { it is FreeSpace && it.length >= lastFile.length }
+
+            if (firstFreeSpaceIndex == -1 || firstFreeSpaceIndex > lastFileIndex) {
+                continue
+            }
+
+
+            val newLength = hardDrive[firstFreeSpaceIndex].length - lastFile.length
+            val deleted = hardDrive.removeAt(lastFileIndex)
+
+            // Shrink free space
+            if (newLength < 1) {
+                hardDrive[firstFreeSpaceIndex] = deleted
+                hardDrive.add(lastFileIndex, FreeSpace(hardDrive[firstFreeSpaceIndex].length))
+            } else {
+                hardDrive.add(firstFreeSpaceIndex, lastFile)
+                hardDrive[firstFreeSpaceIndex + 1] = FreeSpace(newLength)
+                hardDrive.add(lastFileIndex + 1, FreeSpace(deleted.length))
+            }
+
+
+            // Merge free spaces
+
+            for (index in hardDrive.indices) {
+                if (index + 1 >= hardDrive.size) break
+
+                if (hardDrive[index] is FreeSpace && hardDrive[index + 1] is FreeSpace) {
+                    val removedSpace = hardDrive.removeAt(index + 1)
+                    val preserved = (hardDrive[index] as FreeSpace).copy(length = hardDrive[index].length + removedSpace.length)
+
+                    hardDrive[index] = preserved
+                }
+            }
+
+        }
+
+        var checksum = 0L
+        var currentId = 0
+        for (entity in hardDrive) {
+            if (entity is File) {
+                for (i in 0..<entity.length) {
+                    checksum += (currentId++ * entity.id)
+
+                    if (checksum < 0) throw IllegalStateException("KAN NIETTTTT")
+                }
+            } else {
+                currentId += entity.length
+            }
+        }
+
+        return checksum
+
     }
 }
