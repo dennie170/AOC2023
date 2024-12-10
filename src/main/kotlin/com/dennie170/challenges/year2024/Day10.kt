@@ -11,12 +11,14 @@ class Day10 : Day<Int>(2024, 10) {
 
     override fun setUp() {
         input = super.readInput().replace("\n", "")
-        matrix = getMatrix(input.toCharArray().map { it.digitToInt() })
+        matrix = getMatrix(input.toCharArray().map { if(it == '.') -1 else it.digitToInt() })
     }
 
     private val reachedPeaks = mutableSetOf<Pair<Coordinates, Coordinates>>()
 
     private val trialHeads = mutableListOf<Pair<Coordinates, Int>>()
+
+    private val trialHeadScores = mutableMapOf<Coordinates, Int>()
 
 
     // Recursive function to walk the trial
@@ -34,6 +36,9 @@ class Day10 : Day<Int>(2024, 10) {
                     val trialHeadIndex = trialHeads.indexOfFirst { it.first == trialHead }
                     val head = trialHeads[trialHeadIndex]
                     trialHeads[trialHeadIndex] = head.copy(second = head.second + 1)
+                    trialHeadScores[trialHead] = trialHeadScores[trialHead]!! + 1
+                } else {
+                    trialHeadScores[trialHead] = trialHeadScores[trialHead]!! + 1
                 }
 
             } else walkTrial(trialHead, Coordinates(coordinates.row + 1, coordinates.col))
@@ -49,6 +54,9 @@ class Day10 : Day<Int>(2024, 10) {
                     val trialHeadIndex = trialHeads.indexOfFirst { it.first == trialHead }
                     val head = trialHeads[trialHeadIndex]
                     trialHeads[trialHeadIndex] = head.copy(second = head.second + 1)
+                    trialHeadScores[trialHead] = trialHeadScores[trialHead]!! + 1
+                } else {
+                    trialHeadScores[trialHead] = trialHeadScores[trialHead]!! + 1
                 }
 
             } else walkTrial(trialHead, Coordinates(coordinates.row - 1, coordinates.col))
@@ -64,6 +72,9 @@ class Day10 : Day<Int>(2024, 10) {
                     val trialHeadIndex = trialHeads.indexOfFirst { it.first == trialHead }
                     val head = trialHeads[trialHeadIndex]
                     trialHeads[trialHeadIndex] = head.copy(second = head.second + 1)
+                    trialHeadScores[trialHead] = trialHeadScores[trialHead]!! + 1
+                } else {
+                    trialHeadScores[trialHead] = trialHeadScores[trialHead]!! + 1
                 }
 
 
@@ -79,6 +90,9 @@ class Day10 : Day<Int>(2024, 10) {
                     val trialHeadIndex = trialHeads.indexOfFirst { it.first == trialHead }
                     val head = trialHeads[trialHeadIndex]
                     trialHeads[trialHeadIndex] = head.copy(second = head.second + 1)
+                    trialHeadScores[trialHead] = trialHeadScores[trialHead]!! + 1
+                } else {
+                    trialHeadScores[trialHead] = trialHeadScores[trialHead]!! + 1
                 }
 
             } else walkTrial(trialHead, Coordinates(coordinates.row, coordinates.col - 1))
@@ -93,6 +107,7 @@ class Day10 : Day<Int>(2024, 10) {
                 if (matrix[row][col] != 0) continue // Only filter on starts
 
                 trialHeads.add(Pair(Coordinates(row, col), 0))
+                trialHeadScores[Coordinates(row, col)] = 0
 
                 walkTrial(Coordinates(row, col))
             }
@@ -102,6 +117,22 @@ class Day10 : Day<Int>(2024, 10) {
     }
 
     override fun part2(): Int {
-        TODO()
+
+        trialHeads.clear()
+        trialHeadScores.clear()
+        reachedPeaks.clear()
+
+        for (row in matrix.indices) {
+            for (col in matrix.indices) {
+                if (matrix[row][col] != 0) continue // Only filter on starts
+
+                trialHeads.add(Pair(Coordinates(row, col), 0))
+                trialHeadScores[Coordinates(row, col)] = 0
+
+                walkTrial(Coordinates(row, col))
+            }
+        }
+
+        return trialHeadScores.map { it.value }.sum()
     }
 }
