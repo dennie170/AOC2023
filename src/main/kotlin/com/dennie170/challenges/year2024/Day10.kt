@@ -15,13 +15,13 @@ class Day10 : Day<Int>(2024, 10) {
 
     private val reachedPeaks = mutableSetOf<Pair<Coordinates, Coordinates>>()
 
-    private val trialHeads = mutableListOf<Pair<Coordinates, Int>>()
+    private val trailHeads = mutableListOf<Pair<Coordinates, Int>>()
 
-    private val trialHeadScores = mutableMapOf<Coordinates, Int>()
+    private val trailHeadScores = mutableMapOf<Coordinates, Int>()
 
-    // Recursive function to walk the trial
+    // Recursive function to walk the trail
     // Coordinates do not need to be a 0. Can also pick up a new trail
-    private fun walkTrial(trialHead: Coordinates, coordinates: Coordinates = trialHead) {
+    private fun walkTrail(trailHead: Coordinates, coordinates: Coordinates = trailHead) {
         val currentValue = matrix[coordinates.row][coordinates.col]
 
         for (rowDiff in -1..1) {
@@ -34,41 +34,41 @@ class Day10 : Day<Int>(2024, 10) {
                 if (matrix[coordinates.row + rowDiff][coordinates.col + colDiff] != currentValue + 1) continue
 
                 if (matrix[coordinates.row + rowDiff][coordinates.col + colDiff] == 9) {
-                    if (!reachedPeaks.contains(trialHead to coordinates.copy(row = coordinates.row + rowDiff, col = coordinates.col + colDiff))) {
-                        reachedPeaks.add(trialHead to coordinates.copy(row = coordinates.row + rowDiff, col = coordinates.col + colDiff))
+                    if (!reachedPeaks.contains(trailHead to coordinates.copy(row = coordinates.row + rowDiff, col = coordinates.col + colDiff))) {
+                        reachedPeaks.add(trailHead to coordinates.copy(row = coordinates.row + rowDiff, col = coordinates.col + colDiff))
 
-                        val trialHeadIndex = trialHeads.indexOfFirst { it.first == trialHead }
-                        val head = trialHeads[trialHeadIndex]
-                        trialHeads[trialHeadIndex] = head.copy(second = head.second + 1)
+                        val trailHeadIndex = trailHeads.indexOfFirst { it.first == trailHead }
+                        val head = trailHeads[trailHeadIndex]
+                        trailHeads[trailHeadIndex] = head.copy(second = head.second + 1)
                     }
                     if (part == 2) {
-                        trialHeadScores[trialHead] = trialHeadScores[trialHead]!! + 1
+                        trailHeadScores[trailHead] = trailHeadScores[trailHead]!! + 1
                     }
 
-                } else walkTrial(trialHead, Coordinates(coordinates.row + rowDiff, coordinates.col + colDiff))
+                } else walkTrail(trailHead, Coordinates(coordinates.row + rowDiff, coordinates.col + colDiff))
             }
         }
     }
 
     private fun solve(): Int {
-        trialHeads.clear()
-        trialHeadScores.clear()
+        trailHeads.clear()
+        trailHeadScores.clear()
         reachedPeaks.clear()
 
         for (row in matrix.indices) {
             for (col in matrix.indices) {
                 if (matrix[row][col] != 0) continue // Only filter on starts
 
-                trialHeads.add(Pair(Coordinates(row, col), 0))
+                trailHeads.add(Pair(Coordinates(row, col), 0))
                 if (part == 2) {
-                    trialHeadScores[Coordinates(row, col)] = 0
+                    trailHeadScores[Coordinates(row, col)] = 0
                 }
 
-                walkTrial(Coordinates(row, col))
+                walkTrail(Coordinates(row, col))
             }
         }
 
-        return if (part == 1) trialHeads.sumOf { it.second } else trialHeadScores.map { it.value }.sum()
+        return if (part == 1) trailHeads.sumOf { it.second } else trailHeadScores.map { it.value }.sum()
     }
 
     private var part = 1
