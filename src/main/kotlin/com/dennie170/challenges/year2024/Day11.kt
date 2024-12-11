@@ -54,12 +54,17 @@ class Day11 : Day<Long>(2024, 11) {
     }
 
     override fun part1(): Long {
+        return solve(25)
+    }
+
+    private fun solve(blinks: Int): Long {
+        stones.clear()
 
         for (stone in input) {
             stones[stone] = 1L
         }
 
-        for (i in 0..<25) {
+        for (i in 0..<blinks) {
             blink()
         }
 
@@ -67,6 +72,6 @@ class Day11 : Day<Long>(2024, 11) {
     }
 
     override fun part2(): Long {
-        TODO()
+        return solve(75)
     }
 }
