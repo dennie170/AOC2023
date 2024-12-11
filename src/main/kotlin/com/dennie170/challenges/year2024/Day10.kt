@@ -6,11 +6,10 @@ import com.dennie170.common.getMatrix
 
 class Day10 : Day<Int>(2024, 10) {
 
-    lateinit var input: String
     lateinit var matrix: Array<IntArray>
 
     override fun setUp() {
-        input = super.readInput().replace("\n", "")
+        val input = super.readInput().replace("\n", "")
         matrix = getMatrix(input.toCharArray().map { if (it == '.') -1 else it.digitToInt() })
     }
 
@@ -51,24 +50,7 @@ class Day10 : Day<Int>(2024, 10) {
         }
     }
 
-    private var part = 1
-    override fun part1(): Int {
-
-        for (row in matrix.indices) {
-            for (col in matrix.indices) {
-                if (matrix[row][col] != 0) continue // Only filter on starts
-
-                trialHeads.add(Pair(Coordinates(row, col), 0))
-                walkTrial(Coordinates(row, col))
-            }
-        }
-
-        return trialHeads.sumOf { it.second }
-    }
-
-    override fun part2(): Int {
-        part = 2
-
+    private fun solve(): Int {
         trialHeads.clear()
         trialHeadScores.clear()
         reachedPeaks.clear()
@@ -78,12 +60,25 @@ class Day10 : Day<Int>(2024, 10) {
                 if (matrix[row][col] != 0) continue // Only filter on starts
 
                 trialHeads.add(Pair(Coordinates(row, col), 0))
-                trialHeadScores[Coordinates(row, col)] = 0
+                if (part == 2) {
+                    trialHeadScores[Coordinates(row, col)] = 0
+                }
 
                 walkTrial(Coordinates(row, col))
             }
         }
 
-        return trialHeadScores.map { it.value }.sum()
+        return if (part == 1) trialHeads.sumOf { it.second } else trialHeadScores.map { it.value }.sum()
+    }
+
+    private var part = 1
+    override fun part1(): Int {
+        return solve()
+    }
+
+    override fun part2(): Int {
+        part = 2
+
+        return solve()
     }
 }
