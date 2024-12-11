@@ -17,12 +17,7 @@ class Day11 : Day<Long>(2024, 11) {
         val newStonesMap = mutableMapOf<Long, Long>()
         for ((stone, count) in stones) {
             if (stone == 0L) {
-                if (newStonesMap.contains(1L)) {
-                    newStonesMap[1L] = newStonesMap[1L]!! + count
-                } else {
-                    newStonesMap[1L] = count
-                }
-
+                newStonesMap[1L] = newStonesMap.getOrDefault(1L, 0L) + count
                 continue
             }
 
@@ -36,13 +31,8 @@ class Day11 : Day<Long>(2024, 11) {
                 val first = firstHalf.toLong()
                 val second = secondHalf.toLong()
 
-                if (newStonesMap.contains(first)) {
-                    newStonesMap[first] = newStonesMap[first]!! + count
-                } else newStonesMap[first] = count
-
-                if (newStonesMap.contains(second)) {
-                    newStonesMap[second] = newStonesMap[second]!! + count
-                } else newStonesMap[second] = count
+                newStonesMap[first] = newStonesMap.getOrDefault(first, 0L) + count
+                newStonesMap[second] = newStonesMap.getOrDefault(second, 0L) + count
 
                 continue
             }
