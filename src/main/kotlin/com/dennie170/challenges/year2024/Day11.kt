@@ -5,10 +5,10 @@ import com.dennie170.common.splitInHalf
 
 class Day11 : Day<Long>(2024, 11) {
 
-    lateinit var input: LongArray
+    lateinit var input: String
 
     override fun setUp() {
-        input = super.readInput().split(' ').map { it.toLong() }.toLongArray()
+        input = super.readInput()
     }
 
     private var stones = mutableMapOf<Long, Long>()
@@ -48,9 +48,11 @@ class Day11 : Day<Long>(2024, 11) {
     }
 
     private fun solve(blinks: Int): Long {
+        val array = input.split(' ').map { it.toLong() }.toLongArray()
+
         stones.clear()
 
-        for (stone in input) {
+        for (stone in array) {
             stones[stone] = 1L
         }
 
