@@ -19,7 +19,9 @@ fun findLeastCommonMultiple(numbers: List<Long>): Long {
     return result
 }
 
-private tailrec fun Long.gcd(b: Long): Long = if (b == 0L) this else b.gcd(this % b)
+tailrec fun Long.gcd(b: Long): Long = if (b == 0L) this else b.gcd(this % b)
+
+tailrec fun Int.gcd(b: Int): Int = if (b == 0) this else b.gcd(this % b)
 
 /**
  * Checks if 2 IntRanges are completely overlapping one another
