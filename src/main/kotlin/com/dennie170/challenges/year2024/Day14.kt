@@ -5,8 +5,8 @@ import com.dennie170.Day
 class Day14 : Day<Int>(2024, 14) {
 
     companion object {
-        const val GRID_WIDTH = 101
-        const val GRID_HEIGHT = 103
+        const val GRID_WIDTH = 101//11// 101
+        const val GRID_HEIGHT = 103//7//103
 
         const val SECONDS_TO_RUN = 100
     }
@@ -54,7 +54,7 @@ class Day14 : Day<Int>(2024, 14) {
         return Robot(coordinates, velocity)
     }
 
-    private fun draw(robots: List<Robot>) {
+    private fun draw(robots: List<Robot>, part: Int = 1) {
         val matrix = Array(GRID_HEIGHT) { CharArray(GRID_WIDTH) { '.' } }
 
         for (row in matrix.indices) {
@@ -64,14 +64,21 @@ class Day14 : Day<Int>(2024, 14) {
                 for (robot in robots) {
                     if (robot.position.x == col && robot.position.y == row) {
                         found++
+                        if(part == 2) break
                     }
                 }
                 if (found > 0) {
-                    print(found)
+                    if(part ==2) {
+                        print('#')
+                    } else print(found)
                 } else print('.')
             }
             println()
         }
+
+        println()
+        println()
+        println()
     }
 
     override fun part1(): Int {
@@ -120,7 +127,21 @@ class Day14 : Day<Int>(2024, 14) {
         }
     }
 
+    // 1000 -> too low
+    // 50_000 -> too high
     override fun part2(): Int {
-        TODO()
+        // Easter egg was found manually by looping 50_000 times and grepping output...
+        val robots = lines.map { parseInstruction(it) }
+
+        for (tick in 0..<50_000) {
+
+            for (robot in robots) {
+                robot.moveTick()
+            }
+
+        }
+
+
+        return 6243
     }
 }
