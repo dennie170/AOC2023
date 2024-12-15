@@ -41,3 +41,12 @@ fun Array<Array<Int>>.draw() {
         }
     }
 }
+
+fun Array<CharArray>.draw() {
+    for (row in indices) {
+        println()
+        for (col in this[row].indices) {
+            print(this[row][col])
+        }
+    }
+}
