@@ -21,8 +21,17 @@ class Day16 : Day<Int>(2024, 16) {
         LEFT,
         RIGHT;
 
+        fun toIntArray(): IntArray {
+            return when (this) {
+                RIGHT -> intArrayOf(0, 1)
+                UP -> intArrayOf(1, 0)
+                LEFT -> intArrayOf(0, -1)
+                DOWN -> intArrayOf(-1, 0)
+            }
+        }
+
         companion object {
-            fun fromInts(ints: IntArray): Direction {
+            fun fromIntArray(ints: IntArray): Direction {
                 return when {
                     ints.contentEquals(intArrayOf(0, 1)) -> RIGHT
                     ints.contentEquals(intArrayOf(1, 0)) -> UP
@@ -35,77 +44,89 @@ class Day16 : Day<Int>(2024, 16) {
     }
 
     // 871862 -> too high
+    // 872734 -> too high
     override fun part1(): Int {
         val matrix = getMatrix(input.toCharArray().filter { it != '\n' }.toCharArray())
-
-        val steps = solve(matrix)
 
         var lastDirection: Direction? = null
         var lastPosition: Coordinates? = null
 
+
+        val paths = solve(matrix, 139, 1)
+
+
+        return possibleRoutes.minOf { getCost(it) }
+    }
+
+    private fun getCost(walkedPath: Set<Coordinates>): Int {
+
+        var lastDirection = Direction.RIGHT
+        var lastPosition: Coordinates? = null
+
         var cost = 0
 
-        for (step in steps) {
-            if (lastPosition === null) {
-                lastPosition = step
+        for (position in walkedPath) {
+            if (lastPosition == null) {
+                cost++
+                lastPosition = position
                 continue
             }
 
-            val direction = Direction.fromInts(intArrayOf(step.row - lastPosition.row, step.col - lastPosition.col))
+            val direction = Direction.fromIntArray(intArrayOf(lastPosition.row - position.row, lastPosition.col - position.col))
 
-            if(direction != lastDirection) {
+            if (direction !== lastDirection) {
                 cost += 1000
                 lastDirection = direction
-            } else cost++
+            }
 
 
-            lastPosition = step
+            cost++
+            lastPosition = position
         }
 
         return cost
     }
 
-    private fun solve(matrix: Array<Array<Char>>): List<Coordinates> {
-        val path = mutableListOf<Coordinates>()
+    private data class Route(val path: List<Coordinates>, val cost: Int)
 
-        // Start exploring from the start index
-        if (explore(matrix, 12, 1, path)) {
-            return path
+    private val possibleRoutes = mutableListOf<Set<Coordinates>>()
+
+    private val exploredNodes = mutableSetOf<Coordinates>()
+
+
+    private fun solve(matrix: Array<Array<Char>>, row: Int, col: Int, walkedPath: Set<Coordinates> = linkedSetOf()): Boolean {
+
+        if (matrix[row][col] == 'E') {
+            possibleRoutes.add(walkedPath.plus(Coordinates(row, col)))
+
+            return true
         }
-        return emptyList()
+
+//        exploredNodes.add(Coordinates(row, col))
+
+        for (direction in directions) {
+            val (y, x) = direction
+            if (!isOutOfBounds(matrix, row + y, col + x)
+                && !walkedPath.contains(Coordinates(row + y, col + x))
+//                && !exploredNodes.contains(Coordinates(row + y, col + x))
+                && matrix[row + y][col + x] != '#'
+            ) {
+                solve(matrix, row + y, col + x, walkedPath.plus(Coordinates(row + y, col + x)))
+            }
+        }
+
+        return false
+    }
+
+
+    private fun walk() {
+
     }
 
     private fun isOutOfBounds(matrix: Array<Array<Char>>, row: Int, col: Int): Boolean {
         return row < 0 || row >= matrix.size || col < 0 || col >= matrix.size
     }
 
-    private val exploredNodes = mutableSetOf<Coordinates>()
-
-    private fun explore(matrix: Array<Array<Char>>, row: Int, col: Int, path: MutableList<Coordinates>): Boolean {
-        if (
-            isOutOfBounds(matrix, row, col)
-            || matrix[row][col] == '#'
-            || exploredNodes.contains(Coordinates(row, col))
-        ) {
-            return false
-        }
-
-        path.add(Coordinates(row, col))
-        exploredNodes.add(Coordinates(row, col))
-
-        // Quit at the end
-        if (matrix[row][col] == 'E') return true
-
-        for (direction in directions) {
-            if (explore(matrix, row + direction[0], col +  direction[1], path)) {
-                return true
-            }
-        }
-
-        path.removeAt(path.size - 1)
-        return false
-
-    }
 
     override fun part2(): Int {
         TODO()
