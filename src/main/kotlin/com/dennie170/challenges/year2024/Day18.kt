@@ -4,7 +4,7 @@ import com.dennie170.Day
 import com.dennie170.common.Coordinates
 import java.util.*
 
-class Day18 : Day<Int>(2024, 18) {
+class Day18 : Day<String>(2024, 18) {
 
     private val lines: List<String> = readInput().lines()
 
@@ -12,16 +12,16 @@ class Day18 : Day<Int>(2024, 18) {
         const val GRID_DIMENSION = 70
     }
 
-    override fun part1(): Int {
-        val bytes = mutableSetOf<Coordinates>()
+    private fun parseByte(line: String): Coordinates {
+        val (x, y) = line.split(',').map { it.toInt() }
 
-        for (line in lines.subList(0, 1024)) {
-            val (x, y) = line.split(',').map { it.toInt() }
+        return Coordinates(y, x)
+    }
 
-            bytes.add(Coordinates(y, x))
+    override fun part1(): String {
+        return lines.subList(0, 1024).map(::parseByte).toSet().let { bytes ->
+            (solve(getMaze(bytes)).size - 1).toString()
         }
-
-        return solve(getMaze(bytes)).size - 1
     }
 
     private fun draw(bytes: Set<Coordinates>) {
@@ -55,7 +55,7 @@ class Day18 : Day<Int>(2024, 18) {
     private fun getMaze(bytes: Set<Coordinates>): Array<IntArray> {
         val maze = Array(GRID_DIMENSION + 1) { IntArray(GRID_DIMENSION + 1) { 0 } }
 
-        for(byte in bytes) {
+        for (byte in bytes) {
             maze[byte.row][byte.col] = 1
         }
 
@@ -106,7 +106,7 @@ class Day18 : Day<Int>(2024, 18) {
             for (direction in directions) {
                 val (x, y) = direction
 
-                if(node.coordinates.row + y !in maze.indices || node.coordinates.col + x !in maze.indices) continue
+                if (node.coordinates.row + y !in maze.indices || node.coordinates.col + x !in maze.indices) continue
 
                 val new = Coordinates(node.coordinates.row + y, node.coordinates.col + x)
 
@@ -115,11 +115,21 @@ class Day18 : Day<Int>(2024, 18) {
             }
         }
 
-        throw IllegalStateException("Unsolveable maze 😭")
+        return emptySet()
     }
 
+    override fun part2(): String {
+        // We can skip the first 1024 runs as we know those work
+        for (amount in 1024..<lines.size) {
+            val bytes = lines.subList(0, amount).map(::parseByte).toSet()
 
-    override fun part2(): Int {
-        TODO()
+            val path = solve(getMaze(bytes))
+
+            if (path.isEmpty()) {
+                return lines[amount - 1]
+            }
+        }
+
+        throw IllegalStateException("Can't find byte...")
     }
 }
