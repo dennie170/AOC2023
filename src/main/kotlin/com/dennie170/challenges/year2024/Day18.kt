@@ -3,6 +3,9 @@ package com.dennie170.challenges.year2024
 import com.dennie170.Day
 import com.dennie170.common.Coordinates
 import java.util.*
+import java.util.concurrent.ConcurrentHashMap
+import java.util.concurrent.Executors
+import java.util.concurrent.TimeUnit
 
 class Day18 : Day<String>(2024, 18) {
 
@@ -118,18 +121,39 @@ class Day18 : Day<String>(2024, 18) {
         return emptySet()
     }
 
+    private fun solveOnThread(amount: Int): String? {
+        val bytes = lines.subList(0, amount).map(::parseByte).toSet()
+
+        val path = solve(getMaze(bytes))
+
+        if (path.isEmpty()) {
+            return lines[amount - 1]
+        }
+
+        return null
+    }
+
     override fun part2(): String {
+        val executor = Executors.newVirtualThreadPerTaskExecutor()
+
+        val result = ConcurrentHashMap<Int, String>()
+
         // We can skip the first 1024 runs as we know those work
         for (amount in 1024..<lines.size) {
-            val bytes = lines.subList(0, amount).map(::parseByte).toSet()
+            executor.submit {
+                val res = solveOnThread(amount)
 
-            val path = solve(getMaze(bytes))
-
-            if (path.isEmpty()) {
-                return lines[amount - 1]
+                if (!res.isNullOrEmpty()) {
+                    result[amount] = res
+                    executor.shutdownNow()
+                }
             }
         }
 
-        throw IllegalStateException("Can't find byte...")
+        executor.awaitTermination(1, TimeUnit.SECONDS)
+
+        if (result.isEmpty()) throw IllegalStateException("Could not find blocking byte...")
+
+        return result.toSortedMap().firstEntry().value
     }
 }
