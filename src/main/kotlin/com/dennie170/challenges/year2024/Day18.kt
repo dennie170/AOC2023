@@ -4,18 +4,16 @@ import com.dennie170.Day
 import com.dennie170.common.Coordinates
 import java.util.*
 
-
 class Day18 : Day<Int>(2024, 18) {
 
     private val lines: List<String> = readInput().lines()
-
-    private val bytes = mutableSetOf<Coordinates>()
 
     companion object {
         const val GRID_DIMENSION = 70
     }
 
     override fun part1(): Int {
+        val bytes = mutableSetOf<Coordinates>()
 
         for (line in lines.subList(0, 1024)) {
             val (x, y) = line.split(',').map { it.toInt() }
@@ -23,12 +21,10 @@ class Day18 : Day<Int>(2024, 18) {
             bytes.add(Coordinates(y, x))
         }
 
-        val shortedPath = solve(getMaze())
-
-        return shortedPath.size - 1
+        return solve(getMaze(bytes)).size - 1
     }
 
-    private fun draw() {
+    private fun draw(bytes: Set<Coordinates>) {
         for (row in 0..GRID_DIMENSION) {
             for (col in 0..GRID_DIMENSION) {
                 if (bytes.contains(Coordinates(row, col))) {
@@ -41,7 +37,7 @@ class Day18 : Day<Int>(2024, 18) {
         }
     }
 
-    private fun List<Node>.draw() {
+    private fun List<Node>.draw(bytes: Set<Coordinates>) {
         for (row in 0..GRID_DIMENSION) {
             for (col in 0..GRID_DIMENSION) {
                 if (bytes.contains(Coordinates(row, col))) {
@@ -56,7 +52,7 @@ class Day18 : Day<Int>(2024, 18) {
         }
     }
 
-    private fun getMaze(): Array<IntArray> {
+    private fun getMaze(bytes: Set<Coordinates>): Array<IntArray> {
         val maze = Array(GRID_DIMENSION + 1) { IntArray(GRID_DIMENSION + 1) { 0 } }
 
         for(byte in bytes) {
@@ -66,7 +62,6 @@ class Day18 : Day<Int>(2024, 18) {
         return maze
     }
 
-    private val directions = arrayOf(intArrayOf(0, 1), intArrayOf(1, 0), intArrayOf(0, -1), intArrayOf(-1, 0))
 
     private data class Node(val coordinates: Coordinates, val parent: Node?)
 
@@ -79,6 +74,9 @@ class Day18 : Day<Int>(2024, 18) {
         nextToVisit.add(Node(start, null))
 
         val finish = Coordinates(GRID_DIMENSION, GRID_DIMENSION)
+
+        val directions = arrayOf(intArrayOf(0, 1), intArrayOf(1, 0), intArrayOf(0, -1), intArrayOf(-1, 0))
+
 
         while (nextToVisit.isNotEmpty()) {
             val node = nextToVisit.removeFirst()
