@@ -11,7 +11,7 @@ class Day18 : Day<String>(2024, 18) {
 
     private val lines: List<String> = readInput().lines()
 
-    companion object {
+    private companion object {
         const val GRID_DIMENSION = 70
     }
 

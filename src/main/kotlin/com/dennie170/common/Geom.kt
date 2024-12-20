@@ -27,6 +27,3 @@ fun Line2D.getIntersectionPoint(other: Line2D): Point2D? {
 
 
 data class Vector3d<out T : Number>(val x: T, val y: T, val z: T)
-
-
-data class Coordinates(val row: Int, val col: Int)
