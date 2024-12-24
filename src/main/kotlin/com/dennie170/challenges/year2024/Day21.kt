@@ -36,26 +36,47 @@ class Day21 : Day<Int>(2024, 21) {
             direction.contentEquals(intArrayOf(-1, 0)) -> {
                 '^'
             }
+
             direction.contentEquals(intArrayOf(1, 0)) -> {
                 'v'
             }
+
             direction.contentEquals(intArrayOf(0, 1)) -> {
                 '>'
             }
+
             direction.contentEquals(intArrayOf(0, -1)) -> {
                 '<'
             }
+
             else -> throw IllegalStateException("Illegal operator")
         }
 
         print(char)
     }
 
-    override fun part1(): Int {
+    // Navigate from to coordinates. Returns number of steps taken
+    private fun move(from: Coordinates, to: Coordinates): Int {
+        var moves = 0
 
-        val code = charArrayOf('0', '2', '9', 'A')
+        val path = findShortestPath(NUMERIC_KEYPAD, from, to)
 
+        for (step in path.windowed(2)) {
+            val numericalStartPosition = step[0]
+            val numericalEndPosition = step[1]
 
+            val y = if (numericalEndPosition.row > numericalStartPosition.row) 1 else if (numericalEndPosition.row < numericalStartPosition.row) -1 else 0
+            val x = if (numericalEndPosition.col > numericalStartPosition.col) 1 else if (numericalEndPosition.col < numericalStartPosition.col) -1 else 0
+
+            printOperator(y, x)
+
+            moves++
+        }
+
+        return moves
+    }
+
+    private fun solveCode(code: CharArray): Int {
         val shortestNumericPath = code.toList().windowed(2).map {
             val startCoordinates = NUMERIC_KEYPAD.findCoordinates(it[0])
             val endCoordinates = NUMERIC_KEYPAD.findCoordinates(it[1])
@@ -66,43 +87,32 @@ class Day21 : Day<Int>(2024, 21) {
         var moves = 0
 
         // Move from A to first number
-
-        val startingMoves = findShortestPath(NUMERIC_KEYPAD, NUMERIC_STARTING_POSITION, Coordinates(3, 1))
-
-        for(startingMove in startingMoves.windowed(2)) {
-            val numericalStartPosition = startingMove[0]
-            val numericalEndPosition = startingMove[1]
-
-            val y = if(numericalEndPosition.row > numericalStartPosition.row) 1 else if(numericalEndPosition.row < numericalStartPosition.row) -1 else 0
-            val x = if(numericalEndPosition.col > numericalStartPosition.col) 1 else if(numericalEndPosition.col < numericalStartPosition.col) -1 else 0
-
-            printOperator(y, x)
-
-            moves++
-            currentNumericPosition = Coordinates(currentNumericPosition.row + y, currentNumericPosition.col + x)
-        }
+        moves += move(NUMERIC_STARTING_POSITION, Coordinates(3, 1))
 
         print('A')
 
 
         for (keystroke in shortestNumericPath) {
 
+
             for (move in keystroke.windowed(2)) {
                 val numericalStartPosition = move[0]
                 val numericalEndPosition = move[1]
 
-                val y = if(numericalEndPosition.row > numericalStartPosition.row) 1 else if(numericalEndPosition.row < numericalStartPosition.row) -1 else 0
-                val x = if(numericalEndPosition.col > numericalStartPosition.col) 1 else if(numericalEndPosition.col < numericalStartPosition.col) -1 else 0
-
-                printOperator(y, x)
-
-                moves++
-                currentNumericPosition = Coordinates(currentNumericPosition.row + y, currentNumericPosition.col + x)
+                moves += move(numericalStartPosition, numericalEndPosition)
 
             }
 
             print('A')
         }
+
+        return moves * code.filter { it.isDigit() }.fold("") { acc, int -> acc + int}.toInt()
+    }
+
+    override fun part1(): Int {
+        var moves = 0
+
+        moves += solveCode(charArrayOf('0', '2', '9', 'A'))
 
 
         return moves
