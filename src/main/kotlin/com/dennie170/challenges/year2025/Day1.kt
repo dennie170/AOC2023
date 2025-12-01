@@ -14,11 +14,11 @@ class Day1 : Day<Int>(2025, 1) {
 
     val lines: List<String> = readInput().lines()
 
-    var currentPosition = 50
-
-    var timesOnZero = 0
 
     override fun part1(): Int {
+        var currentPosition = 50
+        var timesOnZero = 0
+
         val instructions = lines.map {
             val direction = if (it.first() == 'L') Direction.LEFT else Direction.RIGHT
             val amount = it.substring(1).toInt()
@@ -28,25 +28,11 @@ class Day1 : Day<Int>(2025, 1) {
         for (instruction in instructions) {
             var next = currentPosition
 
-            val amount = if (instruction.amount / 100 > 0) {
-                instruction.amount % 100
-            } else instruction.amount
-
             next = if (instruction.direction == Direction.LEFT) {
-                next - amount
+                (next - instruction.amount) % 100
             } else {
-                next + amount
+                (next + instruction.amount) % 100
             }
-
-            // Clamp within the amount of the circle
-            if (next > 99) {
-                next = next - 100
-            }
-
-            if (next < 0) {
-                next = 100 - abs(next)
-            }
-
 
             if (next == 0) {
                 timesOnZero++
