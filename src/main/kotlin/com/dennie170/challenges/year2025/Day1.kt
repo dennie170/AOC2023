@@ -44,6 +44,15 @@ class Day1 : Day<Int>(2025, 1) {
         return timesOnZero
     }
 
+    // 4521 -> too low
+    // 5701 -> too low
+    // 7392 -> too high
+    // 7089 -> wrong
+    // 6830 -> wrong
+    // 6541 -> wrong
+    // 5840 -> wrong
+    // 6167 -> wrong
+    // 7312 -> wrong
     override fun part2(): Int {
         TODO()
     }
