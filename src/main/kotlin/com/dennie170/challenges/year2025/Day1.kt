@@ -1,7 +1,6 @@
 package com.dennie170.challenges.year2025
 
 import com.dennie170.Day
-import kotlin.math.abs
 
 class Day1 : Day<Int>(2025, 1) {
 
@@ -54,6 +53,44 @@ class Day1 : Day<Int>(2025, 1) {
     // 6167 -> wrong
     // 7312 -> wrong
     override fun part2(): Int {
-        TODO()
+        var currentPosition = 50
+        var timesOnZero = 0
+
+        val instructions = lines.map {
+            val direction = if (it.first() == 'L') Direction.LEFT else Direction.RIGHT
+            val amount = it.substring(1).toInt()
+            Instruction(direction, amount)
+        }
+
+        for (instruction in instructions) {
+
+            if (instruction.direction == Direction.LEFT) {
+
+                for (i in 0..<instruction.amount) {
+                    currentPosition--
+
+                    if (currentPosition == 0) timesOnZero++
+
+                    if (currentPosition == -1) {
+                        currentPosition = 99
+                    }
+                }
+
+            } else {
+                for (i in 0..<instruction.amount) {
+                    currentPosition++
+
+                    if (currentPosition == 100) {
+                        currentPosition = 0
+                    }
+
+                    if (currentPosition == 0) timesOnZero++
+
+                }
+            }
+
+        }
+
+        return timesOnZero
     }
 }
