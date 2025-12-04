@@ -20,7 +20,6 @@ class Day4 : Day<Int>(2025, 4) {
             }
         }
 
-
         return paperRolls.count { roll ->
             rollCanBeRemoved(roll, matrix, paperRolls)
         }
@@ -45,12 +44,12 @@ class Day4 : Day<Int>(2025, 4) {
 
                 if (paperRolls.contains(Coordinates(row, col))) {
                     adjacentRolls++
+                    if(adjacentRolls > 3) return false
                 }
             }
-
         }
 
-        return adjacentRolls < 4
+        return true
     }
 
 
