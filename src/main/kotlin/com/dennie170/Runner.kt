@@ -7,14 +7,14 @@ class Runner {
         @JvmStatic
         fun main(args: Array<String>) {
 //            runAll()
-            runDay(2025, 3)
+            runDay(2025, 4)
 //           runYear(2024)
         }
 
         private fun runAll() {
             var totalDuration = Duration.ZERO
 
-            for (year in 2022..2024) {
+            for (year in 2022..2025) {
                 totalDuration += runYear(year)
             }
 

@@ -1,6 +1,6 @@
 package com.dennie170
 
-abstract class Day<T>(private val year: Int, val day: Int) {
+abstract class Day<out T>(private val year: Int, val day: Int) {
     protected fun readInput(): String {
         return this.javaClass.getResource("/input/$year/$day.txt")?.readText()?.trim('\n') ?: throw NoInputFileFoundException(year, day)
     }

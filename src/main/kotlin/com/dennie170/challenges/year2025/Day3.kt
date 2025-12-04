@@ -36,6 +36,13 @@ class Day3 : Day<Long>(2025, 3) {
     }
 
     override fun part2(): Long {
-        TODO()
+        val banks = input.lines().map { line -> line.toCharArray().map { char -> char.code - 48 } }
+
+         return banks.map { bank ->
+             bank.withIndex()
+                 .sortedWith(compareBy({ it.value }, { it.index })).reversed().take(12).sortedBy { it.index }.map { it.value }
+         }.sumOf {
+             it.joinToString(separator = "") { list -> list.toString() }.toLong()
+         }
     }
 }
