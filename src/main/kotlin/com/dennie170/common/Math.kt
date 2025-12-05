@@ -32,6 +32,9 @@ tailrec fun Int.gcd(b: Int): Int = if (b == 0) this else b.gcd(this % b)
 fun IntRange.Companion.areCompletelyOverlapping(a: IntRange, b: IntRange): Boolean {
     return (a.first <= b.first && a.last >= b.last) || (b.first <= a.first && b.last >= a.last)
 }
+fun LongRange.Companion.areCompletelyOverlapping(a: LongRange, b: LongRange): Boolean {
+    return (a.first <= b.first && a.last >= b.last) || (b.first <= a.first && b.last >= a.last)
+}
 
 /**
  * Checks if 2 IntRanges are somewhat overlapping one another
@@ -42,6 +45,9 @@ fun IntRange.Companion.areCompletelyOverlapping(a: IntRange, b: IntRange): Boole
  *
  */
 fun IntRange.Companion.areSomewhatOverlapping(a: IntRange, b: IntRange): Boolean {
+    return a.contains(b.first) || a.contains(b.last) || b.contains(a.first) || b.contains(a.last)
+}
+fun LongRange.Companion.areSomewhatOverlapping(a: LongRange, b: LongRange): Boolean {
     return a.contains(b.first) || a.contains(b.last) || b.contains(a.first) || b.contains(a.last)
 }
 
