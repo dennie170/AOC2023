@@ -8,3 +8,7 @@ fun String.splitInHalf(): List<String> {
 fun Char.isEither(a: Char, b: Char): Boolean {
     return this == a || this == b
 }
+
+fun Char.isEmpty(): Boolean {
+    return this == '\u0000'
+}

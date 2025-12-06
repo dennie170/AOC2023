@@ -7,7 +7,7 @@ class Runner {
         @JvmStatic
         fun main(args: Array<String>) {
 //            runAll()
-            runDay(2025, 5)
+            runDay(2025, 6)
 //           runYear(2024)
         }
 
